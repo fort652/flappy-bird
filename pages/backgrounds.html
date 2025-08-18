@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Backgrounds - Tweety Bird</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .background-card {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.1),
+          rgba(255, 255, 255, 0.05)
+        );
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+      }
+
+      .background-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(255, 255, 255, 0.4);
+      }
+
+      .background-card.selected {
+        border-color: #fbbf24;
+        box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+      }
+
+      .background-card.locked {
+        filter: grayscale(100%) brightness(0.4);
+      }
+
+      .background-preview {
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+
+      .unlock-badge {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 min-h-screen text-white"
+  >
+    <!-- Header -->
+    <div class="text-center pt-8 pb-6">
+      <h1 class="text-4xl font-bold text-yellow-400 mb-2">Backgrounds</h1>
+      <p class="text-lg text-gray-300">Customize your experience!</p>
+    </div>
+
+    <!-- Current Background Preview -->
+    <div class="mx-4 mb-6">
+      <div class="stat-card rounded-2xl p-4 text-center">
+        <h3 class="text-lg font-semibold mb-3">Current Background</h3>
+        <div
+          class="background-preview w-full h-32 rounded-xl mb-3"
+          id="currentBackground"
+        >
+          <!-- Current background will be displayed here -->
+        </div>
+        <p class="text-sm text-gray-300" id="currentBackgroundName">Default</p>
+      </div>
+    </div>
+
+    <!-- Background Categories -->
+    <div class="mx-4 mb-6">
+      <div class="flex gap-2 overflow-x-auto pb-2">
+        <button
+          class="category-btn px-4 py-2 bg-yellow-500 text-black rounded-full whitespace-nowrap font-medium"
+          data-category="all"
+        >
+          All
+        </button>
+        <button
+          class="category-btn px-4 py-2 bg-gray-600 text-white rounded-full whitespace-nowrap"
+          data-category="nature"
+        >
+          Nature
+        </button>
+        <button
+          class="category-btn px-4 py-2 bg-gray-600 text-white rounded-full whitespace-nowrap"
+          data-category="urban"
+        >
+          Urban
+        </button>
+        <button
+          class="category-btn px-4 py-2 bg-gray-600 text-white rounded-full whitespace-nowrap"
+          data-category="space"
+        >
+          Space
+        </button>
+        <button
+          class="category-btn px-4 py-2 bg-gray-600 text-white rounded-full whitespace-nowrap"
+          data-category="seasons"
+        >
+          Seasons
+        </button>
+      </div>
+    </div>
+
+    <!-- Backgrounds Grid -->
+    <div class="mx-4 mb-20 grid grid-cols-2 gap-4" id="backgroundsGrid">
+      <!-- Backgrounds will be populated by JavaScript -->
+    </div>
+
+    <!-- Navigation -->
+    <div
+      class="fixed bottom-0 left-0 right-0 bg-gray-900/90 backdrop-blur-sm p-4"
+    >
+      <div class="flex justify-center">
+        <button
+          onclick="window.location.href='../index.html'"
+          class="bg-blue-600 text-white px-6 py-3 rounded-full font-medium hover:bg-blue-700 transition-colors"
+        >
+          ← Back to Menu
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // Background data
+      const backgrounds = [
+        {
+          id: "default",
+          name: "Default Sky",
+          category: "nature",
+          image: "../assets/images/default.jpg",
+          unlocked: true,
+          requirement: "Default background",
+        },
+        {
+          id: "spring",
+          name: "Spring Blossoms",
+          category: "seasons",
+          image: "../assets/images/spring.jpg",
+          unlocked: false,
+          requirement: "Score 25 points",
+        },
+        {
+          id: "summer",
+          name: "Summer Fields",
+          category: "seasons",
+          image: "../assets/images/summer.jpg",
+          unlocked: false,
+          requirement: "Score 50 points",
+        },
+        {
+          id: "autumn",
+          name: "Autumn Colors",
+          category: "seasons",
+          image: "../assets/images/autumn.jpg",
+          unlocked: false,
+          requirement: "Score 75 points",
+        },
+        {
+          id: "winter",
+          name: "Winter Wonderland",
+          category: "seasons",
+          image: "../assets/images/winter.jpg",
+          unlocked: false,
+          requirement: "Score 100 points",
+        },
+        {
+          id: "forest",
+          name: "Mystical Forest",
+          category: "nature",
+          image: "../assets/images/forest.jpg",
+          unlocked: false,
+          requirement: "Play 25 games",
+        },
+        {
+          id: "ocean",
+          name: "Ocean Waves",
+          category: "nature",
+          image: "../assets/images/ocean.jpg",
+          unlocked: false,
+          requirement: "Play 50 games",
+        },
+        {
+          id: "mountain",
+          name: "Mountain Peak",
+          category: "nature",
+          image: "../assets/images/mountain.jpg",
+          unlocked: false,
+          requirement: "Play 75 games",
+        },
+        {
+          id: "desert",
+          name: "Desert Sunset",
+          category: "nature",
+          image: "../assets/images/desert.jpg",
+          unlocked: false,
+          requirement: "Play 100 games",
+        },
+        {
+          id: "city",
+          name: "City Lights",
+          category: "urban",
+          image: "../assets/images/city.jpg",
+          unlocked: false,
+          requirement: "Achieve 5 perfect runs",
+        },
+        {
+          id: "night",
+          name: "Night Sky",
+          category: "space",
+          image: "../assets/images/night.jpg",
+          unlocked: false,
+          requirement: "Play for 7 consecutive days",
+        },
+        {
+          id: "galaxy",
+          name: "Galaxy View",
+          category: "space",
+          image: "../assets/images/galaxy.jpg",
+          unlocked: false,
+          requirement: "Score 150 points",
+        },
+        {
+          id: "space",
+          name: "Deep Space",
+          category: "space",
+          image: "../assets/images/space.jpg",
+          unlocked: false,
+          requirement: "Score 200 points",
+        },
+      ];
+
+      let currentCategory = "all";
+      let currentBackground = "default";
+      let unlockedBackgrounds = new Set(["default"]);
+
+      // Initialize backgrounds
+      function initBackgrounds() {
+        loadProgress();
+        loadCurrentBackground();
+        renderBackgrounds();
+      }
+
+      // Load progress from localStorage
+      function loadProgress() {
+        const saved = localStorage.getItem("flappyBirdProgress");
+        if (saved) {
+          const progress = JSON.parse(saved);
+          unlockedBackgrounds = new Set(
+            progress.unlockedBackgrounds || ["default"]
+          );
+          currentBackground = progress.currentBackground || "default";
+        }
+      }
+
+      // Save progress to localStorage
+      function saveProgress() {
+        const progress = JSON.parse(
+          localStorage.getItem("flappyBirdProgress") || "{}"
+        );
+        progress.unlockedBackgrounds = Array.from(unlockedBackgrounds);
+        progress.currentBackground = currentBackground;
+        localStorage.setItem("flappyBirdProgress", JSON.stringify(progress));
+      }
+
+      // Load current background
+      function loadCurrentBackground() {
+        const saved = localStorage.getItem("flappyBirdBackground");
+        if (saved) {
+          currentBackground = saved;
+        }
+      }
+
+      // Save current background
+      function saveCurrentBackground() {
+        localStorage.setItem("flappyBirdBackground", currentBackground);
+
+        // Also save to progress system for persistence
+        const progress = JSON.parse(
+          localStorage.getItem("flappyBirdProgress") || "{}"
+        );
+        progress.currentBackground = currentBackground;
+        localStorage.setItem("flappyBirdProgress", JSON.stringify(progress));
+      }
+
+      // Update current background preview
+      function updateCurrentBackground() {
+        const background = backgrounds.find(
+          (bg) => bg.id === currentBackground
+        );
+        const preview = document.getElementById("currentBackground");
+        const name = document.getElementById("currentBackgroundName");
+
+        if (background) {
+          preview.style.backgroundImage = `url(${background.image})`;
+          name.textContent = background.name;
+        }
+      }
+
+      // Render backgrounds grid
+      function renderBackgrounds() {
+        const grid = document.getElementById("backgroundsGrid");
+        const filteredBackgrounds =
+          currentCategory === "all"
+            ? backgrounds
+            : backgrounds.filter((bg) => bg.category === currentCategory);
+
+        grid.innerHTML = filteredBackgrounds
+          .map((background) => {
+            const isUnlocked = unlockedBackgrounds.has(background.id);
+            const isSelected = currentBackground === background.id;
+
+            return `
+          <div class="background-card rounded-2xl p-3 ${
+            isSelected ? "selected" : ""
+          } ${!isUnlocked ? "locked" : ""}" 
+               onclick="selectBackground('${background.id}')">
+            <div class="background-preview w-full h-24 rounded-lg mb-3" 
+                 style="background-image: url(${background.image})"></div>
+            <div class="text-center">
+              <h3 class="font-semibold text-sm mb-1 ${
+                isUnlocked ? "text-white" : "text-gray-400"
+              }">${background.name}</h3>
+              ${
+                isUnlocked
+                  ? `<div class="text-xs text-gray-300">${
+                      isSelected ? "Selected" : "Click to select"
+                    }</div>`
+                  : `<div class="unlock-badge text-xs text-black font-bold px-2 py-1 rounded-full">${background.requirement}</div>`
+              }
+            </div>
+          </div>
+        `;
+          })
+          .join("");
+      }
+
+      // Select background
+      function selectBackground(backgroundId) {
+        if (!unlockedBackgrounds.has(backgroundId)) {
+          // Show unlock requirement
+          const character = backgrounds.find((bg) => bg.id === backgroundId);
+          alert(
+            `Unlock this background by: ${
+              backgrounds.find((bg) => bg.id === backgroundId).requirement
+            }`
+          );
+          return;
+        }
+
+        currentBackground = backgroundId;
+        saveCurrentBackground();
+        updateCurrentBackground();
+        renderBackgrounds();
+
+        // Show success message
+        showBackgroundChangeNotification(backgroundId);
+
+        // Trigger custom event for immediate home page update
+        if (window.parent && window.parent !== window) {
+          // If we're in an iframe, notify parent
+          window.parent.postMessage(
+            { type: "backgroundChanged", background: backgroundId },
+            "*"
+          );
+        } else {
+          // If we're in the same window, dispatch custom event
+          window.dispatchEvent(
+            new CustomEvent("backgroundChanged", {
+              detail: { background: backgroundId },
+            })
+          );
+        }
+      }
+
+      // Show background change notification
+      function showBackgroundChangeNotification(backgroundId) {
+        const background = backgrounds.find((bg) => bg.id === backgroundId);
+        const notification = document.createElement("div");
+        notification.className =
+          "fixed top-20 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-full font-bold z-50 animate-bounce";
+        notification.textContent = `🎨 ${background.name} selected!`;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+          notification.remove();
+        }, 3000);
+      }
+
+      // Category filter
+      document.addEventListener("click", (e) => {
+        if (e.target.classList.contains("category-btn")) {
+          // Update active category
+          document.querySelectorAll(".category-btn").forEach((btn) => {
+            btn.className =
+              "category-btn px-4 py-2 bg-gray-600 text-white rounded-full whitespace-nowrap";
+          });
+          e.target.className =
+            "category-btn px-4 py-2 bg-yellow-500 text-black rounded-full whitespace-nowrap font-medium";
+
+          currentCategory = e.target.dataset.category;
+          renderBackgrounds();
+        }
+      });
+
+      // Initialize on load
+      window.addEventListener("load", initBackgrounds);
+    </script>
+  </body>
+</html>

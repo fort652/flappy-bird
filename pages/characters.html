@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Characters - Tweety Bird</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .character-card {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.1),
+          rgba(255, 255, 255, 0.05)
+        );
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+      }
+
+      .character-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(255, 255, 255, 0.4);
+      }
+
+      .character-card.selected {
+        border-color: #fbbf24;
+        box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+      }
+
+      .character-card.locked {
+        filter: grayscale(100%) brightness(0.4);
+      }
+
+      .character-image {
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+
+      .unlock-badge {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
+      }
+
+      .stat-bar {
+        background: linear-gradient(90deg, #10b981, #059669);
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-br from-yellow-900 via-orange-900 to-red-900 min-h-screen text-white"
+  >
+    <!-- Header -->
+    <div class="text-center pt-8 pb-6">
+      <h1 class="text-4xl font-bold text-yellow-400 mb-2">Characters</h1>
+      <p class="text-lg text-gray-300">Choose your bird!</p>
+    </div>
+
+    <!-- Current Character Preview -->
+    <div class="mx-4 mb-6">
+      <div class="setting-card rounded-2xl p-4 text-center">
+        <h3 class="text-lg font-semibold mb-3">Current Character</h3>
+        <div
+          class="character-image w-24 h-24 mx-auto mb-3"
+          id="currentCharacterImage"
+        >
+          <!-- Current character will be displayed here -->
+        </div>
+        <p class="text-sm text-gray-300" id="currentCharacterName">
+          Default Bird
+        </p>
+      </div>
+    </div>
+
+    <!-- Character Categories -->
+    <div class="mx-4 mb-6">
+      <div class="flex gap-2 overflow-x-auto pb-2">
+        <button
+          class="category-btn px-4 py-2 bg-yellow-500 text-black rounded-full whitespace-nowrap font-medium"
+          data-category="all"
+        >
+          All
+        </button>
+        <button
+          class="category-btn px-4 py-2 bg-gray-600 text-white rounded-full whitespace-nowrap"
+          data-category="starter"
+        >
+          Starter
+        </button>
+        <button
+          class="category-btn px-4 py-2 bg-gray-600 text-white rounded-full whitespace-nowrap"
+          data-category="advanced"
+        >
+          Advanced
+        </button>
+        <button
+          class="category-btn px-4 py-2 bg-gray-600 text-white rounded-full whitespace-nowrap"
+          data-category="legendary"
+        >
+          Legendary
+        </button>
+        <button
+          class="category-btn px-4 py-2 bg-gray-600 text-white rounded-full whitespace-nowrap"
+          data-category="special"
+        >
+          Special
+        </button>
+      </div>
+    </div>
+
+    <!-- Characters Grid -->
+    <div class="mx-4 mb-20 grid grid-cols-1 gap-4" id="charactersGrid">
+      <!-- Characters will be populated by JavaScript -->
+    </div>
+
+    <!-- Navigation -->
+    <div
+      class="fixed bottom-0 left-0 right-0 bg-gray-900/90 backdrop-blur-sm p-4"
+    >
+      <div class="flex justify-center">
+        <button
+          onclick="window.location.href='../index.html'"
+          class="bg-blue-600 text-white px-6 py-3 rounded-full font-medium hover:bg-blue-700 transition-colors"
+        >
+          ← Back to Menu
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // Character data
+      const characters = [
+        {
+          id: "default",
+          name: "Default Bird",
+          category: "starter",
+          image: "../assets/images/tweety.png",
+          unlocked: true,
+          requirement: "Default character",
+          stats: {
+            speed: 1.0,
+            agility: 1.0,
+            size: 1.0,
+            special: "None",
+          },
+          description: "A balanced bird with no special abilities.",
+        },
+        {
+          id: "blue",
+          name: "Blue Bird",
+          category: "starter",
+          image: "../assets/images/blue-bird.png",
+          unlocked: false,
+          requirement: "Complete first game",
+          stats: {
+            speed: 1.1,
+            agility: 1.0,
+            size: 0.9,
+            special: "Speed Boost",
+          },
+          description: "Slightly faster than the default bird.",
+        },
+        {
+          id: "purple",
+          name: "Purple Bird",
+          category: "advanced",
+          image: "../assets/images/purple-bird.png",
+          unlocked: false,
+          requirement: "Score 25 points",
+          stats: {
+            speed: 1.0,
+            agility: 1.2,
+            size: 0.8,
+            special: "Agility Boost",
+          },
+          description: "More agile and smaller hitbox.",
+        },
+        {
+          id: "golden",
+          name: "Golden Bird",
+          category: "legendary",
+          image: "../assets/images/tweety.png", // Using tweety as placeholder
+          unlocked: false,
+          requirement: "Score 100 points",
+          stats: {
+            speed: 1.2,
+            agility: 1.1,
+            size: 0.9,
+            special: "Double Points",
+          },
+          description: "Rare bird that earns double points!",
+        },
+        {
+          id: "rainbow",
+          name: "Rainbow Bird",
+          category: "special",
+          image: "../assets/images/tweety.png", // Using tweety as placeholder
+          unlocked: false,
+          requirement: "Play for 7 consecutive days",
+          stats: {
+            speed: 1.0,
+            agility: 1.0,
+            size: 1.0,
+            special: "Rainbow Trail",
+          },
+          description: "Leaves a beautiful rainbow trail behind.",
+        },
+        {
+          id: "ninja",
+          name: "Ninja Bird",
+          category: "advanced",
+          image: "../assets/images/tweety.png", // Using tweety as placeholder
+          unlocked: false,
+          requirement: "Achieve 5 perfect runs",
+          stats: {
+            speed: 1.1,
+            agility: 1.3,
+            size: 0.7,
+            special: "Stealth Mode",
+          },
+          description: "Silent and stealthy with enhanced agility.",
+        },
+        {
+          id: "giant",
+          name: "Giant Bird",
+          category: "special",
+          image: "../assets/images/tweety.png", // Using tweety as placeholder
+          unlocked: false,
+          requirement: "Score 150 points",
+          stats: {
+            speed: 0.8,
+            agility: 0.9,
+            size: 1.5,
+            special: "Crash Through",
+          },
+          description: "Large bird that can break through obstacles.",
+        },
+        {
+          id: "mini",
+          name: "Mini Bird",
+          category: "advanced",
+          image: "../assets/images/tweety.png", // Using tweety as placeholder
+          unlocked: false,
+          requirement: "Score 75 points",
+          stats: {
+            speed: 1.0,
+            agility: 1.4,
+            size: 0.6,
+            special: "Tiny Target",
+          },
+          description: "Extremely small with maximum agility.",
+        },
+      ];
+
+      let currentCategory = "all";
+      let currentCharacter = "default";
+      let unlockedCharacters = new Set(["default"]);
+
+      // Initialize characters
+      function initCharacters() {
+        loadProgress();
+        loadCurrentCharacter();
+        renderCharacters();
+      }
+
+      // Load progress from localStorage
+      function loadProgress() {
+        const saved = localStorage.getItem("flappyBirdProgress");
+        if (saved) {
+          const progress = JSON.parse(saved);
+          unlockedCharacters = new Set(
+            progress.unlockedCharacters || ["default"]
+          );
+          currentCharacter = progress.currentCharacter || "default";
+        }
+      }
+
+      // Save progress to localStorage
+      function saveProgress() {
+        const progress = JSON.parse(
+          localStorage.getItem("flappyBirdProgress") || "{}"
+        );
+        progress.unlockedCharacters = Array.from(unlockedCharacters);
+        progress.currentCharacter = currentCharacter;
+        localStorage.setItem("flappyBirdProgress", JSON.stringify(progress));
+      }
+
+      // Load current character
+      function loadCurrentCharacter() {
+        const saved = localStorage.getItem("flappyBirdCharacter");
+        if (saved) {
+          currentCharacter = saved;
+        }
+      }
+
+      // Save current character
+      function saveCurrentCharacter() {
+        localStorage.setItem("flappyBirdCharacter", currentCharacter);
+      }
+
+      // Update current character preview
+      function updateCurrentCharacter() {
+        const character = characters.find(
+          (char) => char.id === currentCharacter
+        );
+        const preview = document.getElementById("currentCharacterImage");
+        const name = document.getElementById("currentCharacterName");
+
+        if (character) {
+          preview.style.backgroundImage = `url(${character.image})`;
+          name.textContent = character.name;
+        }
+      }
+
+      // Render characters grid
+      function renderCharacters() {
+        const grid = document.getElementById("charactersGrid");
+        const filteredCharacters =
+          currentCategory === "all"
+            ? characters
+            : characters.filter((char) => char.category === currentCategory);
+
+        grid.innerHTML = filteredCharacters
+          .map((character) => {
+            const isUnlocked = unlockedCharacters.has(character.id);
+            const isSelected = currentCharacter === character.id;
+
+            return `
+          <div class="character-card rounded-2xl p-4 ${
+            isSelected ? "selected" : ""
+          } ${!isUnlocked ? "locked" : ""}" 
+               onclick="selectCharacter('${character.id}')">
+            <div class="flex items-start gap-4">
+              <div class="character-image w-20 h-20 rounded-lg" 
+                   style="background-image: url(${character.image})"></div>
+              <div class="flex-1">
+                <div class="flex justify-between items-start mb-2">
+                  <h3 class="text-lg font-semibold ${
+                    isUnlocked ? "text-white" : "text-gray-400"
+                  }">${character.name}</h3>
+                  ${
+                    isUnlocked
+                      ? `<div class="text-xs text-gray-300">${
+                          isSelected ? "Selected" : "Click to select"
+                        }</div>`
+                      : `<div class="unlock-badge text-xs text-black font-bold px-2 py-1 rounded-full">${character.requirement}</div>`
+                  }
+                </div>
+                <p class="text-sm text-gray-300 mb-3">${
+                  character.description
+                }</p>
+                
+                ${
+                  isUnlocked
+                    ? `
+                  <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                      <span class="text-xs text-gray-400">Speed:</span>
+                      <div class="w-20 bg-gray-700 rounded-full h-2">
+                        <div class="stat-bar h-2 rounded-full" style="width: ${
+                          character.stats.speed * 100
+                        }%"></div>
+                      </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                      <span class="text-xs text-gray-400">Agility:</span>
+                      <div class="w-20 bg-gray-700 rounded-full h-2">
+                        <div class="stat-bar h-2 rounded-full" style="width: ${
+                          character.stats.agility * 100
+                        }%"></div>
+                      </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                      <span class="text-xs text-gray-400">Size:</span>
+                      <div class="w-20 bg-gray-700 rounded-full h-2">
+                        <div class="stat-bar h-2 rounded-full" style="width: ${
+                          character.stats.size * 100
+                        }%"></div>
+                      </div>
+                    </div>
+                    <div class="text-xs text-yellow-400 font-medium">Special: ${
+                      character.stats.special
+                    }</div>
+                  </div>
+                `
+                    : ""
+                }
+              </div>
+            </div>
+          </div>
+        `;
+          })
+          .join("");
+      }
+
+      // Select character
+      function selectCharacter(characterId) {
+        if (!unlockedCharacters.has(characterId)) {
+          // Show unlock requirement
+          const character = characters.find((char) => char.id === characterId);
+          alert(`Unlock this character by: ${character.requirement}`);
+          return;
+        }
+
+        currentCharacter = characterId;
+        saveCurrentCharacter();
+        updateCurrentCharacter();
+        renderCharacters();
+      }
+
+      // Category filter
+      document.addEventListener("click", (e) => {
+        if (e.target.classList.contains("category-btn")) {
+          // Update active category
+          document.querySelectorAll(".category-btn").forEach((btn) => {
+            btn.className =
+              "category-btn px-4 py-2 bg-gray-600 text-white rounded-full whitespace-nowrap";
+          });
+          e.target.className =
+            "category-btn px-4 py-2 bg-yellow-500 text-black rounded-full whitespace-nowrap font-medium";
+
+          currentCategory = e.target.dataset.category;
+          renderCharacters();
+        }
+      });
+
+      // Initialize on load
+      window.addEventListener("load", initCharacters);
+    </script>
+  </body>
+</html>

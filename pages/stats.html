@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Statistics - Tweety Bird</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      .stat-card {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.1),
+          rgba(255, 255, 255, 0.05)
+        );
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .chart-container {
+        position: relative;
+        height: 200px;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-br from-green-900 via-blue-900 to-purple-900 min-h-screen text-white"
+  >
+    <!-- Header -->
+    <div class="text-center pt-8 pb-6">
+      <h1 class="text-4xl font-bold text-yellow-400 mb-2">Statistics</h1>
+      <p class="text-lg text-gray-300">Track your progress!</p>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="mx-4 mb-6 grid grid-cols-2 gap-4">
+      <div class="stat-card rounded-2xl p-4 text-center">
+        <div class="text-3xl font-bold text-yellow-400" id="totalGames">0</div>
+        <div class="text-sm text-gray-300">Games Played</div>
+      </div>
+      <div class="stat-card rounded-2xl p-4 text-center">
+        <div class="text-3xl font-bold text-blue-400" id="highScore">0</div>
+        <div class="text-sm text-gray-300">High Score</div>
+      </div>
+      <div class="stat-card rounded-2xl p-4 text-center">
+        <div class="text-3xl font-bold text-green-400" id="avgScore">0</div>
+        <div class="text-sm text-gray-300">Avg Score</div>
+      </div>
+      <div class="stat-card rounded-2xl p-4 text-center">
+        <div class="text-3xl font-bold text-purple-400" id="totalTime">0</div>
+        <div class="text-sm text-gray-300">Total Time</div>
+      </div>
+    </div>
+
+    <!-- Score Distribution Chart -->
+    <div class="mx-4 mb-6">
+      <div class="stat-card rounded-2xl p-4">
+        <h3 class="text-lg font-semibold mb-4 text-center">
+          Score Distribution
+        </h3>
+        <div class="chart-container">
+          <canvas id="scoreChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Games -->
+    <div class="mx-4 mb-6">
+      <div class="stat-card rounded-2xl p-4">
+        <h3 class="text-lg font-semibold mb-4">Recent Games</h3>
+        <div class="space-y-3 max-h-48 overflow-y-auto" id="recentGames">
+          <!-- Recent games will be populated here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Performance Metrics -->
+    <div class="mx-4 mb-6">
+      <div class="stat-card rounded-2xl p-4">
+        <h3 class="text-lg font-semibold mb-4">Performance Metrics</h3>
+        <div class="space-y-3">
+          <div class="flex justify-between items-center">
+            <span class="text-gray-300">Best Streak:</span>
+            <span class="font-semibold text-yellow-400" id="bestStreak">0</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-300">Perfect Runs:</span>
+            <span class="font-semibold text-green-400" id="perfectRuns">0</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-300">Consecutive Days:</span>
+            <span class="font-semibold text-blue-400" id="consecutiveDays"
+              >0</span
+            >
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-300">Total Distance:</span>
+            <span class="font-semibold text-purple-400" id="totalDistance"
+              >0m</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div
+      class="fixed bottom-0 left-0 right-0 bg-gray-900/90 backdrop-blur-sm p-4"
+    >
+      <div class="flex justify-center">
+        <button
+          onclick="window.location.href='../index.html'"
+          class="bg-blue-600 text-white px-6 py-3 rounded-full font-medium hover:bg-blue-700 transition-colors"
+        >
+          ← Back to Menu
+        </button>
+      </div>
+    </div>
+
+    <script>
+      let scoreChart;
+
+      // Initialize statistics
+      function initStats() {
+        loadStats();
+        renderStats();
+        createScoreChart();
+        renderRecentGames();
+      }
+
+      // Load statistics from localStorage
+      function loadStats() {
+        const saved = localStorage.getItem("flappyBirdStats");
+        if (saved) {
+          window.gameStats = JSON.parse(saved);
+        } else {
+          window.gameStats = {
+            gamesPlayed: 0,
+            highScore: 0,
+            totalScore: 0,
+            totalTime: 0,
+            recentGames: [],
+            scoreHistory: [],
+            bestStreak: 0,
+            perfectRuns: 0,
+            consecutiveDays: 0,
+            totalDistance: 0,
+            lastPlayed: null,
+          };
+        }
+      }
+
+      // Render main statistics
+      function renderStats() {
+        const stats = window.gameStats;
+
+        document.getElementById("totalGames").textContent =
+          stats.gamesPlayed || 0;
+        document.getElementById("highScore").textContent = stats.highScore || 0;
+        document.getElementById("avgScore").textContent =
+          stats.gamesPlayed > 0
+            ? Math.round(stats.totalScore / stats.gamesPlayed)
+            : 0;
+        document.getElementById("totalTime").textContent = formatTime(
+          stats.totalTime || 0
+        );
+        document.getElementById("bestStreak").textContent =
+          stats.bestStreak || 0;
+        document.getElementById("perfectRuns").textContent =
+          stats.perfectRuns || 0;
+        document.getElementById("consecutiveDays").textContent =
+          stats.consecutiveDays || 0;
+        document.getElementById("totalDistance").textContent = `${Math.round(
+          (stats.totalDistance || 0) / 100
+        )}m`;
+      }
+
+      // Create score distribution chart
+      function createScoreChart() {
+        const ctx = document.getElementById("scoreChart").getContext("2d");
+        const stats = window.gameStats;
+
+        // Create score buckets
+        const buckets = [0, 5, 10, 25, 50, 100, 200];
+        const data = new Array(buckets.length - 1).fill(0);
+
+        if (stats.scoreHistory) {
+          stats.scoreHistory.forEach((score) => {
+            for (let i = 0; i < buckets.length - 1; i++) {
+              if (score >= buckets[i] && score < buckets[i + 1]) {
+                data[i]++;
+                break;
+              }
+            }
+          });
+        }
+
+        scoreChart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: ["0-4", "5-9", "10-24", "25-49", "50-99", "100+"],
+            datasets: [
+              {
+                label: "Games",
+                data: data,
+                backgroundColor: "rgba(59, 130, 246, 0.8)",
+                borderColor: "rgba(59, 130, 246, 1)",
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false,
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  color: "rgba(255, 255, 255, 0.7)",
+                },
+                grid: {
+                  color: "rgba(255, 255, 255, 0.1)",
+                },
+              },
+              x: {
+                ticks: {
+                  color: "rgba(255, 255, 255, 0.7)",
+                },
+                grid: {
+                  color: "rgba(255, 255, 255, 0.1)",
+                },
+              },
+            },
+          },
+        });
+      }
+
+      // Render recent games
+      function renderRecentGames() {
+        const container = document.getElementById("recentGames");
+        const recentGames = window.gameStats.recentGames || [];
+
+        if (recentGames.length === 0) {
+          container.innerHTML =
+            '<div class="text-center text-gray-400 py-4">No games played yet</div>';
+          return;
+        }
+
+        container.innerHTML = recentGames
+          .slice(0, 10)
+          .map(
+            (game) => `
+        <div class="flex justify-between items-center p-3 bg-white/5 rounded-lg">
+          <div class="flex items-center gap-3">
+            <div class="text-2xl">${getScoreEmoji(game.score)}</div>
+            <div>
+              <div class="font-semibold">Score: ${game.score}</div>
+              <div class="text-sm text-gray-400">${formatDate(
+                game.timestamp
+              )}</div>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="text-sm text-gray-300">${formatTime(
+              game.duration
+            )}</div>
+            <div class="text-xs text-gray-400">${game.distance}m</div>
+          </div>
+        </div>
+      `
+          )
+          .join("");
+      }
+
+      // Helper functions
+      function formatTime(ms) {
+        if (ms < 60000) return `${Math.round(ms / 1000)}s`;
+        const minutes = Math.floor(ms / 60000);
+        const seconds = Math.round((ms % 60000) / 1000);
+        return `${minutes}m ${seconds}s`;
+      }
+
+      function formatDate(timestamp) {
+        const date = new Date(timestamp);
+        const now = new Date();
+        const diff = now - date;
+
+        if (diff < 86400000) {
+          // Less than 24 hours
+          return date.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+        } else if (diff < 604800000) {
+          // Less than 7 days
+          return date.toLocaleDateString([], { weekday: "short" });
+        } else {
+          return date.toLocaleDateString([], {
+            month: "short",
+            day: "numeric",
+          });
+        }
+      }
+
+      function getScoreEmoji(score) {
+        if (score === 0) return "🥚";
+        if (score < 5) return "🐣";
+        if (score < 10) return "🐦";
+        if (score < 25) return "⭐";
+        if (score < 50) return "🌟";
+        if (score < 100) return "🏆";
+        return "👑";
+      }
+
+      // Initialize on load
+      window.addEventListener("load", initStats);
+    </script>
+  </body>
+</html>

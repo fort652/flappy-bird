@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .background-image {
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        transition: background-image 0.5s ease;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-800 m-0 p-0 overflow-hidden font-sans h-screen">
+    <div
+      class="relative w-screen h-screen background-image"
+      id="mainBackground"
+    >
+      <div class="text-center mt-16">
+        <h1 class="text-yellow-400 text-[100px] font-bold">Tweety Bird</h1>
+        <p class="text-white text-[60px] font-medium">High Score:</p>
+      </div>
+
+      <div class="flex flex-col gap-6 ml-10 mt-32">
+        <game-button
+          title="Achievements"
+          route="pages/achievements.html"
+          image="assets/images/achievement.png"
+        ></game-button>
+        <game-button
+          title="Statistics"
+          route="pages/stats.html"
+          image="assets/images/pie-chart.png"
+        ></game-button>
+        <game-button
+          title="Background"
+          route="pages/backgrounds.html"
+          image="assets/images/canvas.png"
+        ></game-button>
+        <game-button
+          title="Settings"
+          route="pages/settings.html"
+          image="assets/images/gear.png"
+        ></game-button>
+        <game-button
+          title="Characters"
+          route="pages/characters.html"
+          image="assets/images/tweety.png"
+        ></game-button>
+      </div>
+
+      <div class="flex justify-center mt-32">
+        <play-button
+          title="Play"
+          route="game.html"
+          image="assets/images/play.png"
+        ></play-button>
+      </div>
+      <div
+        class="flex justify-between px-10 relative bottom-0 left-0 right-0 mt-32"
+      >
+        <button
+          class="bg-blue-500 rounded-full w-[100px] h-[100px] flex items-center justify-center cursor-pointer transition-all duration-300 ease-in-out hover:scale-110"
+        >
+          <img
+            src="assets/images/back.png"
+            alt="Back"
+            class="w-[100px] h-[100px] object-contain"
+          />
+        </button>
+        <button
+          class="bg-red-500 rounded-full w-[100px] h-[100px] flex flex-col items-center justify-center cursor-pointer transition-all duration-300 ease-in-out hover:scale-110 text-white text-xs font-bold"
+        >
+          <img
+            src="assets/images/reset.png"
+            alt="Reset"
+            class="w-[100px] h-[100px] object-contain"
+          />
+        </button>
+      </div>
+    </div>
+    <script type="module">
+      import "./components/PlayButton.js";
+      import "./components/Buttons.js";
+    </script>
+
+    <script>
+      // Load and apply selected background
+      function loadSelectedBackground() {
+        const selectedBackground =
+          localStorage.getItem("flappyBirdBackground") || "default";
+        const backgroundElement = document.getElementById("mainBackground");
+
+        // Create image to check if it exists
+        const img = new Image();
+        img.onload = function () {
+          // Background image exists, apply it
+          backgroundElement.style.backgroundImage = `url(assets/images/${selectedBackground}.jpg)`;
+          backgroundElement.style.backgroundColor = "transparent";
+        };
+        img.onerror = function () {
+          // Background image doesn't exist, use fallback
+          console.log(
+            `Background image not found: ${selectedBackground}.jpg, using fallback`
+          );
+          backgroundElement.style.backgroundImage = "none";
+          backgroundElement.style.backgroundColor = "rgb(31, 41, 55)"; // bg-gray-800
+        };
+
+        // Try to load the image
+        img.src = `assets/images/${selectedBackground}.jpg`;
+
+        // Add text shadow for better readability
+        const textElements = document.querySelectorAll("h1, p");
+        textElements.forEach((element) => {
+          element.style.textShadow = "2px 2px 4px rgba(0, 0, 0, 0.8)";
+        });
+      }
+
+      // Initialize background when page loads
+      window.addEventListener("load", loadSelectedBackground);
+
+      // Listen for background changes from other pages
+      window.addEventListener("storage", function (e) {
+        if (e.key === "flappyBirdBackground") {
+          loadSelectedBackground();
+        }
+      });
+
+      // Also listen for custom events (for same-page updates)
+      window.addEventListener("backgroundChanged", function (e) {
+        loadSelectedBackground();
+      });
+    </script>
+  </body>
+</html>
