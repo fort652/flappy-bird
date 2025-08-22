@@ -6,7 +6,6 @@
     <title>Flappy Bird</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-      /* Custom styles that can't be easily replicated with Tailwind */
       canvas {
         display: block;
         background: linear-gradient(to bottom, #87ceeb 0%, #98fb98 100%);
@@ -55,7 +54,6 @@
         }
       }
 
-      /* Remove touch feedback effects */
       canvas {
         -webkit-tap-highlight-color: transparent;
         -webkit-touch-callout: none;
@@ -67,7 +65,6 @@
         outline: none;
       }
 
-      /* Ensure no unwanted outlines or borders */
       * {
         -webkit-tap-highlight-color: transparent;
       }
@@ -90,7 +87,6 @@
         </div>
       </div>
 
-      <!-- Countdown Overlay -->
       <div
         class="countdown-overlay"
         id="countdownOverlay"
@@ -128,7 +124,6 @@
     </script>
 
     <script>
-      // Game constants - now dynamic based on screen size
       let CANVAS_WIDTH, CANVAS_HEIGHT;
       const GRAVITY = 0.6;
       const FLAP_SPEED = -8;
@@ -147,7 +142,6 @@
       let gameStartTime = 0;
       let gameStats = {};
 
-      // Bird object with character support
       const bird = {
         x: 150,
         y: CANVAS_HEIGHT / 2,
@@ -158,39 +152,33 @@
         specialEffects: [],
       };
 
-      // Pipes array
       let pipes = [];
 
-      // Game loop variables
       let lastTime = 0;
       let pipeSpawnTimer = 0;
 
-      // Audio system
       let audioContext;
       let masterVolume = 0.8;
       let soundEffects = true;
       let bgMusic = true;
       let musicVolume = 0.6;
+      let currentAudioSource = null; // Track current playing audio
+      let gameStartAudioSource = null; // Track the game start audio
 
-      // Initialize game
       function init() {
         canvas = document.getElementById("gameCanvas");
         ctx = canvas.getContext("2d");
 
-        // Set canvas dimensions to screen size
         CANVAS_WIDTH = window.innerWidth;
         CANVAS_HEIGHT = window.innerHeight;
         canvas.width = CANVAS_WIDTH;
         canvas.height = CANVAS_HEIGHT;
 
-        // Load game settings and progress
         loadGameSettings();
         loadGameProgress();
 
-        // Initialize audio
         initAudio();
 
-        // Event listeners
         document.addEventListener("keydown", handleKeyDown);
         canvas.addEventListener("click", handleClick);
         window.addEventListener("resize", handleResize);
@@ -198,7 +186,6 @@
         startGame();
       }
 
-      // Load game settings
       function loadGameSettings() {
         const saved = localStorage.getItem("flappyBirdSettings");
         if (saved) {
@@ -210,7 +197,6 @@
         }
       }
 
-      // Load game progress
       function loadGameProgress() {
         const saved = localStorage.getItem("flappyBirdProgress");
         if (saved) {
@@ -224,24 +210,17 @@
         }
       }
 
-      // Initialize audio system
       function initAudio() {
         try {
           audioContext = new (window.AudioContext ||
             window.webkitAudioContext)();
           
-          // Test if we can load the MP3 file
           testMP3Load();
-          
-          if (bgMusic) {
-            // playBackgroundMusic();
-          }
         } catch (e) {
           console.log("Audio not supported");
         }
       }
 
-      // Test MP3 loading
       function testMP3Load() {
         fetch("assets/sounds/8bit1.mp3")
           .then(response => {
@@ -257,43 +236,6 @@
           });
       }
 
-      // Play background music
-      function playBackgroundMusic() {
-        if (!bgMusic || !audioContext) return;
-
-        // Create a simple 8-bit style background music
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-
-        oscillator.type = "square";
-        oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
-
-        gainNode.gain.setValueAtTime(
-          musicVolume * masterVolume,
-          audioContext.currentTime
-        );
-
-        oscillator.start();
-
-        // Simple melody pattern
-        const notes = [440, 494, 523, 587, 659, 587, 523, 494];
-        let noteIndex = 0;
-
-        setInterval(() => {
-          if (bgMusic && gameRunning) {
-            oscillator.frequency.setValueAtTime(
-              notes[noteIndex],
-              audioContext.currentTime
-            );
-            noteIndex = (noteIndex + 1) % notes.length;
-          }
-        }, 1000);
-      }
-
-      // Play sound effect
       function playSound(frequency, duration, type = "sine") {
         if (!soundEffects || !audioContext) return;
 
@@ -322,19 +264,20 @@
         oscillator.stop(audioContext.currentTime + duration);
       }
 
-      // Play MP3 sound effect
-      function playMP3Sound(audioPath) {
+      function playMP3Sound(audioPath, onSourceCreated = null) {
         if (!soundEffects || !audioContext) {
           console.log("Sound effects disabled or audio context not available");
-          return;
+          return null;
         }
 
-        // Resume audio context if it's suspended
         if (audioContext.state === 'suspended') {
           audioContext.resume();
         }
 
         console.log("Attempting to play MP3:", audioPath);
+
+        // Stop any currently playing audio before starting new one
+        stopCurrentAudio();
 
         fetch(audioPath)
           .then(response => {
@@ -351,35 +294,80 @@
           .then(audioBuffer => {
             console.log("Audio decoded successfully, duration:", audioBuffer.duration);
             
-            // Add a small delay to ensure audio context is ready
-            setTimeout(() => {
-              const source = audioContext.createBufferSource();
-              const gainNode = audioContext.createGain();
+            const source = audioContext.createBufferSource();
+            const gainNode = audioContext.createGain();
 
-              source.buffer = audioBuffer;
-              source.connect(gainNode);
-              gainNode.connect(audioContext.destination);
+            source.buffer = audioBuffer;
+            source.connect(gainNode);
+            gainNode.connect(audioContext.destination);
 
-              // Set volume and add fade-in effect
-              gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-              gainNode.gain.linearRampToValueAtTime(
-                0.5 * masterVolume,
-                audioContext.currentTime + 0.1
-              );
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(
+              0.5 * masterVolume,
+              audioContext.currentTime + 0.1
+            );
 
-              source.start();
-              console.log("MP3 sound started playing with delay");
-            }, 100);
+            source.start();
+            console.log("MP3 sound started playing:", audioPath);
+            
+            // Store the audio source for potential stopping
+            currentAudioSource = source;
+            
+            // Call the callback if provided
+            if (onSourceCreated) {
+              onSourceCreated(source);
+            }
           })
           .catch(error => {
             console.error("Error loading audio file:", error);
-            // Fallback to generated sound if MP3 fails to load
             console.log("Falling back to generated sound");
-            // playSound(400, 0.4, "sine"); // Changed to lower frequency and sine wave
           });
       }
 
-      // Handle window resize
+      function stopCurrentAudio() {
+        if (currentAudioSource) {
+          try {
+            console.log("Stopping current audio source");
+            currentAudioSource.stop();
+            currentAudioSource = null;
+            console.log("Current audio stopped successfully");
+          } catch (error) {
+            console.log("Current audio already stopped or finished:", error.message);
+            currentAudioSource = null;
+          }
+        } else {
+          console.log("No current audio source to stop");
+        }
+      }
+
+      function stopGameStartAudio() {
+        if (gameStartAudioSource) {
+          try {
+            console.log("Stopping game start audio source");
+            gameStartAudioSource.stop();
+            gameStartAudioSource = null;
+            console.log("Game start audio stopped successfully");
+          } catch (error) {
+            console.log("Game start audio already stopped or finished:", error.message);
+            gameStartAudioSource = null;
+          }
+        } else {
+          console.log("No game start audio source to stop");
+        }
+      }
+
+      function stopAllAudio() {
+        console.log("Stopping all audio sources");
+        stopCurrentAudio();
+        stopGameStartAudio();
+      }
+
+      function forcePlayAudio(audioPath) {
+        console.log("Force playing audio:", audioPath);
+        stopAllAudio();
+        playMP3Sound(audioPath);
+      }
+
       function handleResize() {
         CANVAS_WIDTH = window.innerWidth;
         CANVAS_HEIGHT = window.innerHeight;
@@ -387,16 +375,18 @@
         canvas.height = CANVAS_HEIGHT;
       }
 
-      // Start new game
       function startGame() {
-        // Resume audio context if suspended (required for user interaction)
         if (audioContext && audioContext.state === 'suspended') {
           audioContext.resume().then(() => {
             console.log("Audio context resumed");
           });
         }
 
-        gameRunning = false; // Don't start immediately
+        // Stop any currently playing audio when starting a new game
+        console.log("Starting new game - stopping all audio");
+        stopAllAudio();
+
+        gameRunning = false;
         countdownActive = true;
         countdownValue = 3;
         score = 0;
@@ -411,15 +401,12 @@
         document.getElementById("gameOver").style.display = "none";
         document.getElementById("countdownOverlay").style.display = "block";
 
-        // Start countdown
         startCountdown();
       }
 
-      // Start countdown sequence
       function startCountdown() {
         updateCountdownDisplay();
 
-        // Start countdown render loop
         const countdownRenderLoop = () => {
           if (countdownActive) {
             renderCountdown();
@@ -439,7 +426,6 @@
         }, 1000);
       }
 
-      // Update countdown display
       function updateCountdownDisplay() {
         const countdownNumber = document.getElementById("countdownNumber");
         const countdownText = document.querySelector(".countdown-text");
@@ -448,43 +434,47 @@
           countdownNumber.textContent = countdownValue;
           countdownText.textContent = "Get Ready!";
 
-          // Play countdown sound
-          // playSound(800 + countdownValue * 100, 0.2, "sine");
         } else {
           countdownNumber.textContent = "GO!";
           countdownText.textContent = "Start Flying!";
 
-          // Play go sound
-          playMP3Sound("assets/sounds/8bit1.mp3");
+          // Play game start sound and track the source
+          console.log("Playing game start sound (8bit1)");
+          playMP3Sound("assets/sounds/8bit1.mp3", (source) => {
+            console.log("Game start audio source created:", source);
+            gameStartAudioSource = source;
+          });
         }
       }
 
-      // End countdown and start game
       function endCountdown() {
         countdownActive = false;
         gameRunning = true;
 
-        // Hide countdown overlay
+        // Stop the game start audio when the game actually starts
+        stopGameStartAudio();
+
         setTimeout(() => {
           document.getElementById("countdownOverlay").style.display = "none";
         }, 1000);
 
-        // Start the actual game
         gameLoop();
       }
 
-      // Restart game
       function restartGame() {
-        // Hide game over screen
         document.getElementById("gameOver").style.display = "none";
 
-        // Start new game with countdown
+        // Stop any current audio before restarting
+        stopCurrentAudio();
+
         startGame();
       }
 
-      // Go home function
       function goHome() {
-        // Check if we're in a subdirectory and go up, or go to index.html
+        // Stop any current audio when leaving the game
+        stopCurrentAudio();
+        stopGameStartAudio();
+
         if (window.location.pathname.includes("/")) {
           window.location.href = "../index.html";
         } else {
@@ -492,7 +482,6 @@
         }
       }
 
-      // Handle keyboard input
       function handleKeyDown(e) {
         if (e.code === "Space" && gameRunning) {
           e.preventDefault();
@@ -500,25 +489,18 @@
         }
       }
 
-      // Handle mouse click
       function handleClick() {
         if (gameRunning) {
           flap();
         }
       }
 
-      // Make bird flap
       function flap() {
         bird.velocity = FLAP_SPEED;
 
-        // Play flap sound
-        // playSound(600, 0.1, "triangle");
-
-        // Add special effects based on character
         addSpecialEffects();
       }
 
-      // Add special effects based on character
       function addSpecialEffects() {
         switch (bird.character) {
           case "rainbow":
@@ -540,12 +522,10 @@
         }
       }
 
-      // Update bird physics
       function updateBird(deltaTime) {
         bird.velocity += GRAVITY;
         bird.y += bird.velocity;
 
-        // Check boundaries
         if (bird.y < 0) {
           bird.y = 0;
           bird.velocity = 0;
@@ -554,61 +534,48 @@
           gameOver();
         }
 
-        // Update special effects
         bird.specialEffects = bird.specialEffects.filter((effect) => {
           effect.life--;
           return effect.life > 0;
         });
       }
 
-      // Update pipes
       function updatePipes(deltaTime) {
-        // Spawn new pipes
         pipeSpawnTimer += deltaTime;
         if (pipeSpawnTimer > PIPE_SPAWN_RATE) {
           spawnPipe();
           pipeSpawnTimer = 0;
         }
 
-        // Move pipes and check collisions
         for (let i = pipes.length - 1; i >= 0; i--) {
           const pipe = pipes[i];
           pipe.x -= PIPE_SPEED;
 
-          // Remove off-screen pipes
           if (pipe.x + PIPE_WIDTH < 0) {
             pipes.splice(i, 1);
             continue;
           }
 
-          // Check collision with bird
           if (checkCollision(bird, pipe)) {
             gameOver();
             return;
           }
 
-          // Score point when passing pipe
           if (!pipe.passed && pipe.x + PIPE_WIDTH < bird.x) {
             pipe.passed = true;
             score++;
 
-            // Character bonus effects
             if (bird.character === "golden") {
-              score++; // Double points
+              score++;
             }
 
             document.getElementById("score").textContent = score;
 
-            // Play score sound
-            // playSound(1000 + score * 50, 0.1);
-
-            // Check achievements
             checkAchievements();
           }
         }
       }
 
-      // Spawn new pipe
       function spawnPipe() {
         const gapY = Math.random() * (CANVAS_HEIGHT - PIPE_GAP - 100) + 50;
         pipes.push({
@@ -618,9 +585,7 @@
         });
       }
 
-      // Check collision between bird and pipe
       function checkCollision(bird, pipe) {
-        // Adjust collision based on character size
         let effectiveSize = bird.size;
         if (bird.character === "mini") effectiveSize *= 0.6;
         if (bird.character === "giant") effectiveSize *= 1.5;
@@ -632,7 +597,6 @@
         );
       }
 
-      // Check achievements
       function checkAchievements() {
         const progress = JSON.parse(
           localStorage.getItem("flappyBirdProgress") || "{}"
@@ -642,7 +606,6 @@
           localStorage.getItem("flappyBirdStats") || "{}"
         );
 
-        // Score achievements
         if (score >= 10 && !unlocked.has("score_10")) {
           unlockAchievement("score_10", "Getting Started");
           unlockCharacter("blue");
@@ -674,14 +637,12 @@
           unlockBackground("space");
         }
 
-        // Check for first game achievement
         if (stats.gamesPlayed === 1 && !unlocked.has("first_flight")) {
           unlockAchievement("first_flight", "First Flight");
           unlockCharacter("blue");
         }
       }
 
-      // Unlock achievement
       function unlockAchievement(id, title) {
         const progress = JSON.parse(
           localStorage.getItem("flappyBirdProgress") || "{}"
@@ -691,17 +652,12 @@
           progress.unlocked.push(id);
           localStorage.setItem("flappyBirdProgress", JSON.stringify(progress));
 
-          // Show achievement notification
           showAchievementNotification(title);
-
-          // Play achievement sound
-          // playSound(1200, 0.3, "sawtooth");
 
           console.log(`Achievement unlocked: ${title}`);
         }
       }
 
-      // Unlock character
       function unlockCharacter(characterId) {
         const progress = JSON.parse(
           localStorage.getItem("flappyBirdProgress") || "{}"
@@ -714,7 +670,6 @@
         }
       }
 
-      // Unlock background
       function unlockBackground(backgroundId) {
         const progress = JSON.parse(
           localStorage.getItem("flappyBirdProgress") || "{}"
@@ -727,7 +682,6 @@
         }
       }
 
-      // Show achievement notification
       function showAchievementNotification(title) {
         const notification = document.createElement("div");
         notification.className =
@@ -740,31 +694,28 @@
         }, 3000);
       }
 
-      // Game over
       function gameOver() {
         gameRunning = false;
 
-        // Calculate game statistics
         const gameDuration = Date.now() - gameStartTime;
-        const distance = score * 100; // Rough distance calculation
+        const distance = score * 100;
 
-        // Update high score
         if (score > highScore) {
           highScore = score;
           localStorage.setItem("flappyBirdHighScore", highScore);
         }
 
-        // Save game statistics
         saveGameStats(score, gameDuration, distance);
-
-        // Play game over sound
-        // playSound(200, 0.5, "sawtooth");
 
         document.getElementById("finalScore").textContent = score;
         document.getElementById("gameOver").style.display = "block";
+
+        // Stop any current audio and play game over sound
+        console.log("Game over - stopping current audio and playing 8bit3");
+        stopAllAudio();
+        playMP3Sound("assets/sounds/8bit3.mp3");
       }
 
-      // Save game statistics
       function saveGameStats(score, duration, distance) {
         const stats = JSON.parse(
           localStorage.getItem("flappyBirdStats") || "{}"
@@ -776,7 +727,6 @@
         stats.totalTime = (stats.totalTime || 0) + duration;
         stats.totalDistance = (stats.totalDistance || 0) + distance;
 
-        // Track consecutive days
         const today = new Date().toDateString();
         if (!stats.lastPlayed) {
           stats.lastPlayed = today;
@@ -795,7 +745,6 @@
           stats.lastPlayed = today;
         }
 
-        // Track perfect runs (no pipe hits)
         if (score > 0) {
           stats.perfectRuns = (stats.perfectRuns || 0) + 1;
         }
@@ -813,25 +762,22 @@
 
         stats.scoreHistory.push(score);
 
-        // Keep only last 50 games
         if (stats.recentGames.length > 50) {
           stats.recentGames = stats.recentGames.slice(0, 50);
         }
 
         localStorage.setItem("flappyBirdStats", JSON.stringify(stats));
 
-        // Check for achievements based on new stats
         checkAchievementsAfterGame(stats);
       }
 
-      // Check achievements after game ends
       function checkAchievementsAfterGame(stats) {
         const progress = JSON.parse(
           localStorage.getItem("flappyBirdProgress") || "{}"
         );
         const unlocked = new Set(progress.unlocked || []);
 
-        // Games played achievements
+
         if (stats.gamesPlayed >= 10 && !unlocked.has("games_10")) {
           unlockAchievement("games_10", "Dedicated Player");
           unlockBackground("ocean");
@@ -849,7 +795,6 @@
           unlockBackground("city");
         }
 
-        // Perfect runs achievements
         if (stats.perfectRuns >= 5 && !unlocked.has("perfect_5")) {
           unlockAchievement("perfect_5", "Perfect Player");
           unlockBackground("city");
@@ -860,27 +805,22 @@
           unlockCharacter("ninja");
         }
 
-        // Consecutive days achievements
         if (stats.consecutiveDays >= 7 && !unlocked.has("daily_player")) {
           unlockAchievement("daily_player", "Daily Player");
           unlockBackground("rainbow");
           unlockCharacter("rainbow");
         }
 
-        // Distance achievements
         if (stats.totalDistance >= 10000 && !unlocked.has("distance_10k")) {
           unlockAchievement("distance_10k", "Long Distance Flier");
           unlockBackground("desert");
         }
       }
 
-      // Render functions
       function renderBird() {
-        // Clear any previous rendering artifacts
         ctx.save();
         ctx.globalCompositeOperation = "source-over";
 
-        // Apply character-specific modifications
         let effectiveSize = bird.size;
         let effectiveColor = bird.color;
 
@@ -901,7 +841,6 @@
             break;
         }
 
-        // Draw bird
         ctx.fillStyle = effectiveColor;
         ctx.beginPath();
         ctx.arc(
@@ -913,7 +852,6 @@
         );
         ctx.fill();
 
-        // Bird eye
         ctx.fillStyle = "#000";
         ctx.beginPath();
         ctx.arc(
@@ -925,7 +863,6 @@
         );
         ctx.fill();
 
-        // Bird wing
         ctx.fillStyle = "#FFA500";
         ctx.beginPath();
         ctx.ellipse(
@@ -939,13 +876,11 @@
         );
         ctx.fill();
 
-        // Render special effects
         renderSpecialEffects();
 
         ctx.restore();
       }
 
-      // Render special effects
       function renderSpecialEffects() {
         bird.specialEffects.forEach((effect) => {
           switch (effect.type) {
@@ -970,10 +905,8 @@
         ctx.fillStyle = "#228B22";
 
         pipes.forEach((pipe) => {
-          // Top pipe
           ctx.fillRect(pipe.x, 0, PIPE_WIDTH, pipe.gapY);
 
-          // Bottom pipe
           ctx.fillRect(
             pipe.x,
             pipe.gapY + PIPE_GAP,
@@ -981,7 +914,6 @@
             CANVAS_HEIGHT - pipe.gapY - PIPE_GAP
           );
 
-          // Pipe caps
           ctx.fillStyle = "#006400";
           ctx.fillRect(pipe.x - 5, pipe.gapY - 20, PIPE_WIDTH + 10, 20);
           ctx.fillRect(pipe.x - 5, pipe.gapY + PIPE_GAP, PIPE_WIDTH + 10, 20);
@@ -990,13 +922,11 @@
       }
 
       function renderBackground() {
-        // Load selected background
         const selectedBackground =
           localStorage.getItem("flappyBirdBackground") || "default";
         const backgroundImage = new Image();
         backgroundImage.src = `assets/images/${selectedBackground}.jpg`;
 
-        // Draw clouds
         ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
         for (let i = 0; i < 5; i++) {
           const x = ((Date.now() * 0.02 + i * 200) % (CANVAS_WIDTH + 100)) - 50;
@@ -1015,36 +945,28 @@
         ctx.fill();
       }
 
-      // Main game loop
       function gameLoop(currentTime = 0) {
         if (!gameRunning) return;
 
         const deltaTime = currentTime - lastTime;
         lastTime = currentTime;
 
-        // Update game state
         updateBird(deltaTime);
         updatePipes(deltaTime);
 
-        // Clear canvas
         ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-        // Additional clearing to prevent artifacts
         ctx.globalCompositeOperation = "source-over";
         ctx.globalAlpha = 1.0;
 
-        // Render everything
         renderBackground();
         renderPipes();
         renderBird();
 
-        // Continue loop
         requestAnimationFrame(gameLoop);
       }
 
-      // Render bird during countdown (static position)
       function renderBirdStatic() {
-        // Apply character-specific modifications
         let effectiveSize = bird.size;
         let effectiveColor = bird.color;
 
@@ -1065,11 +987,9 @@
             break;
         }
 
-        // Clear any previous rendering artifacts
         ctx.save();
         ctx.globalCompositeOperation = "source-over";
 
-        // Draw bird in static position
         ctx.fillStyle = effectiveColor;
         ctx.beginPath();
         ctx.arc(
@@ -1081,7 +1001,6 @@
         );
         ctx.fill();
 
-        // Bird eye
         ctx.fillStyle = "#000";
         ctx.beginPath();
         ctx.arc(
@@ -1093,7 +1012,6 @@
         );
         ctx.fill();
 
-        // Bird wing
         ctx.fillStyle = "#FFA500";
         ctx.beginPath();
         ctx.ellipse(
@@ -1110,26 +1028,19 @@
         ctx.restore();
       }
 
-      // Render countdown screen
       function renderCountdown() {
-        // Clear canvas
         ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-        // Additional clearing to prevent artifacts
         ctx.globalCompositeOperation = "source-over";
         ctx.globalAlpha = 1.0;
 
-        // Render background
         renderBackground();
 
-        // Render bird in static position
         renderBirdStatic();
 
-        // Render pipes (if any exist)
         renderPipes();
       }
 
-      // Start the game when page loads
       window.addEventListener("load", init);
     </script>
   </body>

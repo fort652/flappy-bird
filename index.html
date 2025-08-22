@@ -85,21 +85,17 @@
     </script>
 
     <script>
-      // Load and apply selected background
       function loadSelectedBackground() {
         const selectedBackground =
           localStorage.getItem("flappyBirdBackground") || "default";
         const backgroundElement = document.getElementById("mainBackground");
 
-        // Create image to check if it exists
         const img = new Image();
         img.onload = function () {
-          // Background image exists, apply it
           backgroundElement.style.backgroundImage = `url(assets/images/${selectedBackground}.jpg)`;
           backgroundElement.style.backgroundColor = "transparent";
         };
         img.onerror = function () {
-          // Background image doesn't exist, use fallback
           console.log(
             `Background image not found: ${selectedBackground}.jpg, using fallback`
           );
@@ -107,27 +103,22 @@
           backgroundElement.style.backgroundColor = "rgb(31, 41, 55)"; // bg-gray-800
         };
 
-        // Try to load the image
         img.src = `assets/images/${selectedBackground}.jpg`;
 
-        // Add text shadow for better readability
         const textElements = document.querySelectorAll("h1, p");
         textElements.forEach((element) => {
           element.style.textShadow = "2px 2px 4px rgba(0, 0, 0, 0.8)";
         });
       }
 
-      // Initialize background when page loads
       window.addEventListener("load", loadSelectedBackground);
 
-      // Listen for background changes from other pages
       window.addEventListener("storage", function (e) {
         if (e.key === "flappyBirdBackground") {
           loadSelectedBackground();
         }
       });
 
-      // Also listen for custom events (for same-page updates)
       window.addEventListener("backgroundChanged", function (e) {
         loadSelectedBackground();
       });
