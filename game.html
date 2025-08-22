@@ -229,12 +229,32 @@
         try {
           audioContext = new (window.AudioContext ||
             window.webkitAudioContext)();
+          
+          // Test if we can load the MP3 file
+          testMP3Load();
+          
           if (bgMusic) {
-            playBackgroundMusic();
+            // playBackgroundMusic();
           }
         } catch (e) {
           console.log("Audio not supported");
         }
+      }
+
+      // Test MP3 loading
+      function testMP3Load() {
+        fetch("assets/sounds/8bit1.mp3")
+          .then(response => {
+            console.log("MP3 test - Status:", response.status, "OK:", response.ok);
+            if (response.ok) {
+              console.log("MP3 file is accessible");
+            } else {
+              console.error("MP3 file not accessible:", response.status);
+            }
+          })
+          .catch(error => {
+            console.error("MP3 test failed:", error);
+          });
       }
 
       // Play background music
@@ -302,6 +322,63 @@
         oscillator.stop(audioContext.currentTime + duration);
       }
 
+      // Play MP3 sound effect
+      function playMP3Sound(audioPath) {
+        if (!soundEffects || !audioContext) {
+          console.log("Sound effects disabled or audio context not available");
+          return;
+        }
+
+        // Resume audio context if it's suspended
+        if (audioContext.state === 'suspended') {
+          audioContext.resume();
+        }
+
+        console.log("Attempting to play MP3:", audioPath);
+
+        fetch(audioPath)
+          .then(response => {
+            console.log("Fetch response status:", response.status);
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.arrayBuffer();
+          })
+          .then(arrayBuffer => {
+            console.log("Audio file loaded, size:", arrayBuffer.byteLength);
+            return audioContext.decodeAudioData(arrayBuffer);
+          })
+          .then(audioBuffer => {
+            console.log("Audio decoded successfully, duration:", audioBuffer.duration);
+            
+            // Add a small delay to ensure audio context is ready
+            setTimeout(() => {
+              const source = audioContext.createBufferSource();
+              const gainNode = audioContext.createGain();
+
+              source.buffer = audioBuffer;
+              source.connect(gainNode);
+              gainNode.connect(audioContext.destination);
+
+              // Set volume and add fade-in effect
+              gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+              gainNode.gain.linearRampToValueAtTime(
+                0.5 * masterVolume,
+                audioContext.currentTime + 0.1
+              );
+
+              source.start();
+              console.log("MP3 sound started playing with delay");
+            }, 100);
+          })
+          .catch(error => {
+            console.error("Error loading audio file:", error);
+            // Fallback to generated sound if MP3 fails to load
+            console.log("Falling back to generated sound");
+            // playSound(400, 0.4, "sine"); // Changed to lower frequency and sine wave
+          });
+      }
+
       // Handle window resize
       function handleResize() {
         CANVAS_WIDTH = window.innerWidth;
@@ -312,6 +389,13 @@
 
       // Start new game
       function startGame() {
+        // Resume audio context if suspended (required for user interaction)
+        if (audioContext && audioContext.state === 'suspended') {
+          audioContext.resume().then(() => {
+            console.log("Audio context resumed");
+          });
+        }
+
         gameRunning = false; // Don't start immediately
         countdownActive = true;
         countdownValue = 3;
@@ -365,13 +449,13 @@
           countdownText.textContent = "Get Ready!";
 
           // Play countdown sound
-          playSound(800 + countdownValue * 100, 0.2, "sine");
+          // playSound(800 + countdownValue * 100, 0.2, "sine");
         } else {
           countdownNumber.textContent = "GO!";
           countdownText.textContent = "Start Flying!";
 
           // Play go sound
-          playSound(1200, 0.4, "sawtooth");
+          playMP3Sound("assets/sounds/8bit1.mp3");
         }
       }
 
@@ -428,7 +512,7 @@
         bird.velocity = FLAP_SPEED;
 
         // Play flap sound
-        playSound(600, 0.1, "triangle");
+        // playSound(600, 0.1, "triangle");
 
         // Add special effects based on character
         addSpecialEffects();
@@ -516,7 +600,7 @@
             document.getElementById("score").textContent = score;
 
             // Play score sound
-            playSound(1000 + score * 50, 0.1);
+            // playSound(1000 + score * 50, 0.1);
 
             // Check achievements
             checkAchievements();
@@ -611,7 +695,7 @@
           showAchievementNotification(title);
 
           // Play achievement sound
-          playSound(1200, 0.3, "sawtooth");
+          // playSound(1200, 0.3, "sawtooth");
 
           console.log(`Achievement unlocked: ${title}`);
         }
@@ -674,7 +758,7 @@
         saveGameStats(score, gameDuration, distance);
 
         // Play game over sound
-        playSound(200, 0.5, "sawtooth");
+        // playSound(200, 0.5, "sawtooth");
 
         document.getElementById("finalScore").textContent = score;
         document.getElementById("gameOver").style.display = "block";
