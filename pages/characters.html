@@ -55,6 +55,43 @@
       .stat-bar {
         background: linear-gradient(90deg, #10b981, #059669);
       }
+
+      /* Character Info Popup Animations */
+      @keyframes popupSlideIn {
+        0% {
+          transform: scale(0.8) translateY(20px);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(1) translateY(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes popupFadeIn {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      #characterInfoPopup {
+        animation: popupFadeIn 0.3s ease-out;
+      }
+
+      #characterInfoPopup > div {
+        animation: popupSlideIn 0.4s ease-out;
+      }
+
+      .info-button {
+        transition: all 0.2s ease;
+      }
+
+      .info-button:hover {
+        transform: scale(1.1);
+      }
     </style>
   </head>
   <body
@@ -121,6 +158,62 @@
     <!-- Characters Grid -->
     <div class="mx-4 mb-20 grid grid-cols-1 gap-3 md:gap-4" id="charactersGrid">
       <!-- Characters will be populated by JavaScript -->
+    </div>
+
+    <!-- Character Info Popup -->
+    <div
+      id="characterInfoPopup"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] hidden"
+      onclick="hideCharacterInfo()"
+    >
+      <div
+        class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 max-w-lg mx-4 max-h-[90vh] overflow-y-auto"
+        onclick="event.stopPropagation()"
+      >
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-yellow-400" id="popupTitle">Character Info</h2>
+          <button
+            onclick="hideCharacterInfo()"
+            class="text-gray-400 hover:text-white text-2xl font-bold transition-colors"
+          >
+            ×
+          </button>
+        </div>
+
+        <!-- Character Image and Name -->
+        <div class="text-center mb-6">
+          <div
+            id="popupCharacterImage"
+            class="character-image w-24 h-24 rounded-lg mx-auto mb-3"
+          ></div>
+          <h3 class="text-xl font-semibold text-white" id="popupCharacterName">Character Name</h3>
+        </div>
+
+        <!-- Character Description -->
+        <div class="mb-6">
+          <p class="text-gray-300 text-center" id="popupDescription">Character description</p>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="mb-6" id="popupStats">
+          <!-- Stats will be populated by JavaScript -->
+        </div>
+
+        <!-- Special Ability Section -->
+        <div class="mb-6" id="popupSpecialAbility">
+          <!-- Special ability info will be populated by JavaScript -->
+        </div>
+
+        <!-- How to Use Section -->
+        <div class="p-4 bg-blue-900 bg-opacity-30 rounded-lg border border-blue-500 border-opacity-30">
+          <h3 class="text-lg font-semibold text-blue-300 mb-2">🎮 How to Use Special Ability</h3>
+          <p class="text-gray-300 text-sm">
+            <strong>In the game:</strong> Tap the lightning bolt button (⚡) to activate your bird's special ability! 
+            Each ability has a cooldown period, so use them strategically.
+          </p>
+        </div>
+      </div>
     </div>
 
     <!-- Navigation -->
@@ -354,13 +447,24 @@
                   <h3 class="text-lg font-semibold ${
                     isUnlocked ? "text-white" : "text-gray-400"
                   }">${character.name}</h3>
-                  ${
-                    isUnlocked
-                      ? `<div class="text-xs text-gray-300">${
-                          isSelected ? "Selected" : "Click to select"
-                        }</div>`
-                      : `<div class="unlock-badge text-xs text-black font-bold px-2 py-1 rounded-full">${character.requirement}</div>`
-                  }
+                  <div class="flex items-center gap-2">
+                    ${
+                      isUnlocked
+                        ? `<div class="text-xs text-gray-300">${
+                            isSelected ? "Selected" : "Click to select"
+                          }</div>`
+                        : `<div class="unlock-badge text-xs text-black font-bold px-2 py-1 rounded-full">${character.requirement}</div>`
+                    }
+                    <button 
+                      onclick="showCharacterInfo('${character.id}')" 
+                      class="info-button bg-blue-600 hover:bg-blue-700 text-white w-6 h-6 rounded-full flex items-center justify-center transition-colors"
+                      title="View abilities"
+                    >
+                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+                      </svg>
+                    </button>
+                  </div>
                 </div>
                 <p class="text-sm text-gray-300 mb-3">${
                   character.description
@@ -449,6 +553,174 @@
 
       // Initialize on load
       window.addEventListener("load", initCharacters);
+
+      // Character info popup functions
+      function showCharacterInfo(characterId) {
+        const character = characters.find(char => char.id === characterId);
+        if (!character) return;
+
+        // Update popup content
+        document.getElementById("popupTitle").textContent = "Character Abilities";
+        document.getElementById("popupCharacterName").textContent = character.name;
+        document.getElementById("popupDescription").textContent = character.description;
+        
+        // Update character image
+        const popupImage = document.getElementById("popupCharacterImage");
+        popupImage.style.backgroundImage = `url(${character.image})`;
+
+        // Update stats section
+        const popupStats = document.getElementById("popupStats");
+        popupStats.innerHTML = `
+          <h4 class="text-lg font-semibold text-white mb-3">📊 Character Stats</h4>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-300">Speed:</span>
+              <div class="flex items-center gap-2">
+                <div class="w-24 bg-gray-700 rounded-full h-2">
+                  <div class="stat-bar h-2 rounded-full" style="width: ${character.stats.speed * 100}%"></div>
+                </div>
+                <span class="text-xs text-gray-400">${character.stats.speed}x</span>
+              </div>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-300">Agility:</span>
+              <div class="flex items-center gap-2">
+                <div class="w-24 bg-gray-700 rounded-full h-2">
+                  <div class="stat-bar h-2 rounded-full" style="width: ${character.stats.agility * 100}%"></div>
+                </div>
+                <span class="text-xs text-gray-400">${character.stats.agility}x</span>
+              </div>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-300">Size:</span>
+              <div class="flex items-center gap-2">
+                <div class="w-24 bg-gray-700 rounded-full h-2">
+                  <div class="stat-bar h-2 rounded-full" style="width: ${character.stats.size * 100}%"></div>
+                </div>
+                <span class="text-xs text-gray-400">${character.stats.size}x</span>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Update special ability section
+        const popupSpecialAbility = document.getElementById("popupSpecialAbility");
+        if (character.id === "default") {
+          popupSpecialAbility.innerHTML = `
+            <div class="p-4 bg-gray-800 rounded-lg border border-gray-600">
+              <h4 class="text-lg font-semibold text-white mb-2">⚡ Special Ability</h4>
+              <p class="text-gray-300 text-sm">This character has no special abilities.</p>
+            </div>
+          `;
+        } else {
+          const abilityInfo = getAbilityInfo(character.id);
+          popupSpecialAbility.innerHTML = `
+            <div class="p-4 ${abilityInfo.bgColor} rounded-lg border ${abilityInfo.borderColor}">
+              <h4 class="text-lg font-semibold ${abilityInfo.textColor} mb-2">⚡ ${abilityInfo.title}</h4>
+              <p class="text-gray-300 text-sm mb-3">${abilityInfo.description}</p>
+              <div class="space-y-2 text-xs text-gray-400">
+                <div><strong>Effect:</strong> ${abilityInfo.effect}</div>
+                <div><strong>Duration:</strong> ${abilityInfo.duration}</div>
+                <div><strong>Cooldown:</strong> ${abilityInfo.cooldown}</div>
+                <div><strong>Best for:</strong> ${abilityInfo.bestFor}</div>
+              </div>
+            </div>
+          `;
+        }
+
+        // Show popup
+        document.getElementById("characterInfoPopup").classList.remove("hidden");
+        document.getElementById("characterInfoPopup").style.display = "flex";
+      }
+
+      function hideCharacterInfo() {
+        document.getElementById("characterInfoPopup").classList.add("hidden");
+        document.getElementById("characterInfoPopup").style.display = "none";
+      }
+
+      function getAbilityInfo(characterId) {
+        const abilities = {
+          "blue": {
+            title: "Speed Boost",
+            description: "Temporarily increases speed and reduces gravity for better control.",
+            effect: "10% faster, reduced gravity",
+            duration: "3 seconds",
+            cooldown: "10 seconds",
+            bestFor: "Speed runs, escaping tight spots",
+            bgColor: "bg-blue-900 bg-opacity-30",
+            borderColor: "border-blue-500 border-opacity-30",
+            textColor: "text-blue-300"
+          },
+          "purple": {
+            title: "Agility Boost",
+            description: "Enhanced maneuverability and control for precise flying.",
+            effect: "Better control, reduced gravity",
+            duration: "2 seconds",
+            cooldown: "8 seconds",
+            bestFor: "Precision flying, tight maneuvers",
+            bgColor: "bg-purple-900 bg-opacity-30",
+            borderColor: "border-purple-500 border-opacity-30",
+            textColor: "text-purple-300"
+          },
+          "golden": {
+            title: "Double Points",
+            description: "Earns double points and can activate enhanced point multiplier.",
+            effect: "2x points normally, 4x points when active",
+            duration: "5 seconds",
+            cooldown: "15 seconds",
+            bestFor: "High score attempts",
+            bgColor: "bg-yellow-900 bg-opacity-30",
+            borderColor: "border-yellow-500 border-opacity-30",
+            textColor: "text-yellow-300"
+          },
+          "rainbow": {
+            title: "Rainbow Trail",
+            description: "Creates a beautiful rainbow trail effect around the bird.",
+            effect: "Rainbow aura and particles",
+            duration: "4 seconds",
+            cooldown: "12 seconds",
+            bestFor: "Visual appeal, style points",
+            bgColor: "bg-gradient-to-r from-pink-900 to-purple-900 bg-opacity-30",
+            borderColor: "border-pink-500 border-opacity-30",
+            textColor: "text-pink-300"
+          },
+          "ninja": {
+            title: "Stealth Mode",
+            description: "Enhanced stealth with maximum agility and tiny size.",
+            effect: "Stealth aura and enhanced agility",
+            duration: "3 seconds",
+            cooldown: "10 seconds",
+            bestFor: "Expert precision challenges",
+            bgColor: "bg-gray-900 bg-opacity-30",
+            borderColor: "border-gray-500 border-opacity-30",
+            textColor: "text-gray-300"
+          },
+          "giant": {
+            title: "Crash Through",
+            description: "Becomes massive and can potentially break through obstacles.",
+            effect: "Becomes extremely large",
+            duration: "2 seconds",
+            cooldown: "10 seconds",
+            bestFor: "Tank-style gameplay",
+            bgColor: "bg-red-900 bg-opacity-30",
+            borderColor: "border-red-500 border-opacity-30",
+            textColor: "text-red-300"
+          },
+          "mini": {
+            title: "Mini Mode",
+            description: "Becomes extremely small for maximum agility and precision.",
+            effect: "Becomes extremely small",
+            duration: "4 seconds",
+            cooldown: "12 seconds",
+            bestFor: "Speed runs, high scores",
+            bgColor: "bg-green-900 bg-opacity-30",
+            borderColor: "border-green-500 border-opacity-30",
+            textColor: "text-green-300"
+          }
+        };
+        
+        return abilities[characterId] || abilities["default"];
+      }
     </script>
   </body>
 </html>

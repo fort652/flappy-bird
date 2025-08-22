@@ -206,6 +206,43 @@
         }
       }
 
+      @keyframes lightningPulse {
+        0%, 100% {
+          transform: scale(1);
+          filter: brightness(1);
+        }
+        50% {
+          transform: scale(1.1);
+          filter: brightness(1.3);
+        }
+      }
+
+      @keyframes lightningBolt {
+        0% {
+          transform: scale(1) rotate(0deg);
+        }
+        25% {
+          transform: scale(1.2) rotate(5deg);
+        }
+        50% {
+          transform: scale(1.1) rotate(-3deg);
+        }
+        75% {
+          transform: scale(1.15) rotate(2deg);
+        }
+        100% {
+          transform: scale(1) rotate(0deg);
+        }
+      }
+
+      .lightning-icon {
+        animation: lightningPulse 2s ease-in-out infinite, lightningBolt 3s ease-in-out infinite;
+      }
+
+      .lightning-icon.active {
+        animation: lightningBolt 0.5s ease-in-out infinite;
+      }
+
       canvas {
         -webkit-tap-highlight-color: transparent;
         -webkit-touch-callout: none;
@@ -253,6 +290,37 @@
           0
         </div>
       </div>
+      
+      <!-- Special Ability Button -->
+      <div class="absolute top-5 left-5 z-10">
+        <button
+          id="specialAbilityBtn"
+          class="bg-gradient-to-br from-yellow-400 to-orange-500 w-16 h-16 rounded-full shadow-lg border-2 border-yellow-300 hover:from-yellow-300 hover:to-orange-400 transition-all duration-200 transform hover:scale-110 active:scale-95"
+          onclick="activateSpecialAbility()"
+        >
+          <div class="flex items-center justify-center w-full h-full">
+            <svg id="lightningIcon" class="w-8 h-8 text-white lightning-icon" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+        </button>
+        
+        <!-- Cooldown Overlay -->
+        <div id="cooldownOverlay" class="absolute inset-0 bg-black bg-opacity-50 rounded-full hidden">
+          <div class="flex items-center justify-center w-full h-full">
+            <span id="cooldownText" class="text-white text-xs font-bold"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Special Ability Indicator -->
+      <div class="absolute top-5 right-5 text-white text-sm">
+        <div class="bg-black bg-opacity-50 rounded-lg p-3">
+          <div class="text-yellow-400 font-bold mb-1">Special Ability</div>
+          <div id="abilityStatus" class="text-xs mb-2">Tap lightning bolt to activate</div>
+          <div id="abilityCooldown" class="text-xs text-gray-300"></div>
+        </div>
+      </div>
 
       <div
         class="countdown-overlay"
@@ -286,6 +354,10 @@
             <span class="stats-label">Character:</span>
             <span class="stats-value" id="characterDisplay">Default</span>
           </div>
+          <div class="stats-row">
+            <span class="stats-label">Special Ability:</span>
+            <span class="stats-value text-xs" id="gameOverAbilityText">Tap lightning bolt button</span>
+          </div>
         </div>
 
         <div class="game-over-buttons">
@@ -318,11 +390,11 @@
 
     <script>
       let CANVAS_WIDTH, CANVAS_HEIGHT;
-      const GRAVITY = 0.8;
-      const FLAP_SPEED = -10;
+      const GRAVITY = 0.6;
+      const FLAP_SPEED = -8;
       const PIPE_WIDTH = 80;
       const PIPE_GAP = 200;
-      const PIPE_SPEED = 5;
+      const PIPE_SPEED = 2;
       const PIPE_SPAWN_RATE = 2000;
 
       // Game state
@@ -333,6 +405,9 @@
       let score = 0;
       let highScore = localStorage.getItem("flappyBirdHighScore") || 0;
       let gameStartTime = 0;
+      let specialAbilityActive = false;
+      let specialAbilityCooldown = 0;
+      let specialAbilityDuration = 0;
 
       const bird = {
         x: 150,
@@ -375,6 +450,7 @@
 
         document.addEventListener("keydown", handleKeyDown);
         canvas.addEventListener("click", handleClick);
+        canvas.addEventListener("touchstart", handleTouch);
         window.addEventListener("resize", handleResize);
 
         startGame();
@@ -497,6 +573,22 @@
         
         console.log("=== END DEBUG ===");
       }
+
+      // Test function for special abilities
+      function testSpecialAbility() {
+        console.log("=== TESTING SPECIAL ABILITY ===");
+        console.log("Button element:", document.getElementById("specialAbilityBtn"));
+        console.log("Button disabled:", document.getElementById("specialAbilityBtn")?.disabled);
+        console.log("Current character:", bird.character);
+        console.log("Game running:", gameRunning);
+        console.log("Special ability active:", specialAbilityActive);
+        console.log("Cooldown:", specialAbilityCooldown);
+        console.log("=== END TEST ===");
+      }
+
+      // Make test functions available globally for debugging
+      window.testSpecialAbility = testSpecialAbility;
+      window.debugProgress = debugProgress;
 
       function initAudio() {
         try {
@@ -634,10 +726,18 @@
         pipes = [];
         pipeSpawnTimer = 0;
         bird.specialEffects = [];
+        
+        // Reset special ability system
+        specialAbilityActive = false;
+        specialAbilityCooldown = 0;
+        specialAbilityDuration = 0;
 
         document.getElementById("score").textContent = "0";
         document.getElementById("gameOver").style.display = "none";
         document.getElementById("countdownOverlay").style.display = "block";
+        
+        // Update ability UI to show ready state
+        updateAbilityUI();
 
         startCountdown();
       }
@@ -692,6 +792,9 @@
         setTimeout(() => {
           document.getElementById("countdownOverlay").style.display = "none";
         }, 1000);
+        
+        // Update ability UI when game starts
+        updateAbilityUI();
 
         gameLoop();
       }
@@ -730,6 +833,13 @@
         }
       }
 
+      function handleTouch(e) {
+        if (gameRunning) {
+          e.preventDefault(); // Prevent default touch behavior
+          flap();
+        }
+      }
+
       function flap() {
         bird.velocity = FLAP_SPEED;
 
@@ -744,6 +854,7 @@
               x: bird.x,
               y: bird.y,
               life: 30,
+              followBird: true, // This effect will follow the bird
             });
             break;
           case "ninja":
@@ -752,25 +863,288 @@
               x: bird.x,
               y: bird.y,
               life: 20,
+              followBird: true, // This effect will follow the bird
             });
             break;
         }
       }
 
+      // Special ability system
+      function activateSpecialAbility() {
+        console.log("activateSpecialAbility called!");
+        console.log("Current character:", bird.character);
+        console.log("Special ability active:", specialAbilityActive);
+        console.log("Cooldown remaining:", specialAbilityCooldown);
+        
+        if (specialAbilityCooldown > 0 || specialAbilityActive) {
+          console.log("Cannot activate - on cooldown or already active");
+          return; // Can't activate if on cooldown or already active
+        }
+
+        console.log("Activating special ability for:", bird.character);
+
+        switch (bird.character) {
+          case "blue":
+            activateSpeedBoost();
+            break;
+          case "purple":
+            activateAgilityBoost();
+            break;
+          case "golden":
+            activateDoublePoints();
+            break;
+          case "rainbow":
+            activateRainbowTrail();
+            break;
+          case "ninja":
+            activateStealthMode();
+            break;
+          case "giant":
+            activateCrashThrough();
+            break;
+          case "mini":
+            activateMiniMode();
+            break;
+          default:
+            console.log("Default bird has no special ability");
+            break;
+        }
+      }
+
+      function activateSpeedBoost() {
+        specialAbilityActive = true;
+        specialAbilityDuration = 180; // 3 seconds at 60fps
+        specialAbilityCooldown = 600; // 10 second cooldown
+        
+        // Visual effect that follows the bird
+        bird.specialEffects.push({
+          type: "speedBoost",
+          x: bird.x,
+          y: bird.y,
+          life: 180,
+          followBird: true, // This effect will follow the bird
+        });
+        
+        console.log("Speed Boost activated!");
+      }
+
+      function activateAgilityBoost() {
+        specialAbilityActive = true;
+        specialAbilityDuration = 120; // 2 seconds
+        specialAbilityCooldown = 480; // 8 second cooldown
+        
+        bird.specialEffects.push({
+          type: "agilityBoost",
+          x: bird.x,
+          y: bird.y,
+          life: 120,
+          followBird: true, // This effect will follow the bird
+        });
+        
+        console.log("Agility Boost activated!");
+      }
+
+      function activateDoublePoints() {
+        specialAbilityActive = true;
+        specialAbilityDuration = 300; // 5 seconds
+        specialAbilityCooldown = 900; // 15 second cooldown
+        
+        bird.specialEffects.push({
+          type: "doublePoints",
+          x: bird.x,
+          y: bird.y,
+          life: 300,
+          followBird: true, // This effect will follow the bird
+        });
+        
+        console.log("Double Points activated!");
+      }
+
+      function activateRainbowTrail() {
+        specialAbilityActive = true;
+        specialAbilityDuration = 240; // 4 seconds
+        specialAbilityCooldown = 720; // 12 second cooldown
+        
+        bird.specialEffects.push({
+          type: "rainbowTrail",
+          x: bird.x,
+          y: bird.y,
+          life: 240,
+          followBird: true, // This effect will follow the bird
+        });
+        
+        console.log("Rainbow Trail activated!");
+      }
+
+      function activateStealthMode() {
+        specialAbilityActive = true;
+        specialAbilityDuration = 180; // 3 seconds
+        specialAbilityCooldown = 600; // 10 second cooldown
+        
+        bird.specialEffects.push({
+          type: "stealth",
+          x: bird.x,
+          y: bird.y,
+          life: 180,
+          followBird: true, // This effect will follow the bird
+        });
+        
+        console.log("Stealth Mode activated!");
+      }
+
+      function activateCrashThrough() {
+        specialAbilityActive = true;
+        specialAbilityDuration = 120; // 2 seconds
+        specialAbilityCooldown = 600; // 10 second cooldown
+        
+        bird.specialEffects.push({
+          type: "crashThrough",
+          x: bird.x,
+          y: bird.y,
+          life: 120,
+          followBird: true, // This effect will follow the bird
+        });
+        
+        console.log("Crash Through activated!");
+      }
+
+      function activateMiniMode() {
+        specialAbilityActive = true;
+        specialAbilityDuration = 240; // 4 seconds
+        specialAbilityCooldown = 720; // 12 second cooldown
+        
+        bird.specialEffects.push({
+          type: "miniMode",
+          x: bird.x,
+          y: bird.y,
+          life: 240,
+          followBird: true, // This effect will follow the bird
+        });
+        
+        console.log("Mini Mode activated!");
+      }
+
+      function updateSpecialAbilities() {
+        // Update cooldown
+        if (specialAbilityCooldown > 0) {
+          specialAbilityCooldown--;
+        }
+        
+        // Update duration
+        if (specialAbilityDuration > 0) {
+          specialAbilityDuration--;
+          if (specialAbilityDuration <= 0) {
+            specialAbilityActive = false;
+            console.log("Special ability deactivated");
+          }
+        }
+        
+        // Update UI
+        updateAbilityUI();
+      }
+
+      function updateAbilityUI() {
+        const abilityStatus = document.getElementById("abilityStatus");
+        const abilityCooldown = document.getElementById("abilityCooldown");
+        const specialAbilityBtn = document.getElementById("specialAbilityBtn");
+        const cooldownOverlay = document.getElementById("cooldownOverlay");
+        const cooldownText = document.getElementById("cooldownText");
+        const lightningIcon = document.getElementById("lightningIcon");
+        
+        if (!abilityStatus || !abilityCooldown || !specialAbilityBtn || !cooldownOverlay || !cooldownText || !lightningIcon) return;
+        
+        // Hide button for default bird (no special abilities)
+        if (bird.character === "default") {
+          specialAbilityBtn.style.display = "none";
+          abilityStatus.textContent = "No special abilities";
+          abilityStatus.className = "text-xs mb-2 text-gray-400";
+          abilityCooldown.textContent = "";
+          return;
+        }
+        
+        // Show button for birds with special abilities
+        specialAbilityBtn.style.display = "block";
+        
+        if (specialAbilityActive) {
+          abilityStatus.textContent = "ACTIVE!";
+          abilityStatus.className = "text-xs mb-2 text-green-400 font-bold";
+          abilityCooldown.textContent = `Duration: ${Math.ceil(specialAbilityDuration / 60)}s`;
+          
+          // Disable button and show active state
+          specialAbilityBtn.disabled = true;
+          specialAbilityBtn.className = "bg-gradient-to-br from-green-400 to-green-600 w-16 h-16 rounded-full shadow-lg border-2 border-green-300 transition-all duration-200 transform scale-95";
+          cooldownOverlay.classList.add("hidden");
+          lightningIcon.classList.add("active");
+        } else if (specialAbilityCooldown > 0) {
+          abilityStatus.textContent = "On Cooldown";
+          abilityStatus.className = "text-xs mb-2 text-red-400";
+          abilityCooldown.textContent = `Ready in: ${Math.ceil(specialAbilityCooldown / 60)}s`;
+          
+          // Disable button and show cooldown
+          specialAbilityBtn.disabled = true;
+          specialAbilityBtn.className = "bg-gradient-to-br from-gray-400 to-gray-600 w-16 h-16 rounded-full shadow-lg border-2 border-gray-300 transition-all duration-200";
+          cooldownOverlay.classList.remove("hidden");
+          cooldownText.textContent = Math.ceil(specialAbilityCooldown / 60);
+          lightningIcon.classList.remove("active");
+        } else {
+          abilityStatus.textContent = "Tap lightning bolt to activate";
+          abilityStatus.className = "text-xs mb-2 text-white";
+          abilityCooldown.textContent = "";
+          
+          // Enable button and show ready state
+          specialAbilityBtn.disabled = false;
+          specialAbilityBtn.className = "bg-gradient-to-br from-yellow-400 to-orange-500 w-16 h-16 rounded-full shadow-lg border-2 border-yellow-300 hover:from-yellow-300 hover:to-orange-400 transition-all duration-200 transform hover:scale-110 active:scale-95";
+          cooldownOverlay.classList.add("hidden");
+          lightningIcon.classList.remove("active");
+        }
+      }
+
       function updateBird(deltaTime) {
-        bird.velocity += GRAVITY;
+        // Apply special ability effects
+        let effectiveGravity = GRAVITY;
+        let effectiveFlapSpeed = FLAP_SPEED;
+        let effectiveSize = bird.size;
+        
+        if (specialAbilityActive) {
+          switch (bird.character) {
+            case "blue":
+              effectiveGravity *= 0.7; // Reduced gravity during speed boost
+              break;
+            case "purple":
+              effectiveGravity *= 0.8; // Better control during agility boost
+              break;
+            case "mini":
+              effectiveSize *= 0.4; // Even smaller during mini mode
+              break;
+            case "giant":
+              effectiveSize *= 2.0; // Even larger during crash through
+              break;
+          }
+        }
+        
+        bird.velocity += effectiveGravity;
         bird.y += bird.velocity;
 
         if (bird.y < 0) {
           bird.y = 0;
           bird.velocity = 0;
         }
-        if (bird.y > CANVAS_HEIGHT - bird.size) {
+        if (bird.y > CANVAS_HEIGHT - effectiveSize) {
           gameOver();
         }
 
+        // Update special abilities
+        updateSpecialAbilities();
+
         bird.specialEffects = bird.specialEffects.filter((effect) => {
           effect.life--;
+          
+          // Update position for effects that follow the bird
+          if (effect.followBird) {
+            effect.x = bird.x;
+            effect.y = bird.y;
+          }
+          
           return effect.life > 0;
         });
       }
@@ -798,12 +1172,19 @@
 
           if (!pipe.passed && pipe.x + PIPE_WIDTH < bird.x) {
             pipe.passed = true;
-            score++;
-
+            let pointsEarned = 1;
+            
+            // Character-specific point bonuses
             if (bird.character === "golden") {
-              score++;
+              pointsEarned++;
             }
-
+            
+            // Special ability double points
+            if (specialAbilityActive && bird.character === "golden") {
+              pointsEarned *= 2;
+            }
+            
+            score += pointsEarned;
             document.getElementById("score").textContent = score;
 
             checkAchievements();
@@ -822,8 +1203,22 @@
 
       function checkCollision(bird, pipe) {
         let effectiveSize = bird.size;
+        
+        // Apply character-specific size modifiers
         if (bird.character === "mini") effectiveSize *= 0.6;
         if (bird.character === "giant") effectiveSize *= 1.5;
+        
+        // Apply special ability size modifiers
+        if (specialAbilityActive) {
+          switch (bird.character) {
+            case "mini":
+              effectiveSize *= 0.4; // Even smaller during mini mode
+              break;
+            case "giant":
+              effectiveSize *= 2.0; // Even larger during crash through
+              break;
+          }
+        }
 
         return (
           bird.x + effectiveSize > pipe.x &&
@@ -965,6 +1360,24 @@
         const characterName = characterNames[bird.character] || "Default Bird";
         document.getElementById("characterDisplay").textContent = characterName;
 
+        // Update the special ability text in the game over screen
+        const gameOverAbilityText = document.getElementById("gameOverAbilityText");
+        if (gameOverAbilityText) {
+          if (bird.character === "default") {
+            gameOverAbilityText.textContent = "No special abilities";
+            gameOverAbilityText.className = "text-xs text-gray-400";
+          } else if (specialAbilityActive) {
+            gameOverAbilityText.textContent = `ACTIVE!`;
+            gameOverAbilityText.className = "text-xs text-green-400 font-bold";
+          } else if (specialAbilityCooldown > 0) {
+            gameOverAbilityText.textContent = `Ready in: ${Math.ceil(specialAbilityCooldown / 60)}s`;
+            gameOverAbilityText.className = "text-xs text-red-400";
+          } else {
+            gameOverAbilityText.textContent = "Tap lightning bolt to activate";
+            gameOverAbilityText.className = "text-xs text-white";
+          }
+        }
+
         // Show the enhanced game over screen
         document.getElementById("gameOver").style.display = "block";
 
@@ -1086,7 +1499,7 @@
         console.log(`Rendering bird with character: ${bird.character}`);
         console.log(`Available character images:`, Object.keys(characterImages));
 
-        // Try to load character image if available
+        // Apply character-specific modifiers
         switch (bird.character) {
           case "blue":
             effectiveColor = "#3B82F6";
@@ -1110,6 +1523,18 @@
             useImage = true;
             characterImage = "assets/images/tweety.png";
             break;
+        }
+        
+        // Apply special ability size modifiers
+        if (specialAbilityActive) {
+          switch (bird.character) {
+            case "mini":
+              effectiveSize *= 0.4; // Even smaller during mini mode
+              break;
+            case "giant":
+              effectiveSize *= 2.0; // Even larger during crash through
+              break;
+          }
         }
 
         if (useImage && characterImage) {
@@ -1186,14 +1611,114 @@
               ctx.strokeStyle = `hsl(${(Date.now() * 0.1) % 360}, 100%, 50%)`;
               ctx.lineWidth = 3;
               ctx.beginPath();
-              ctx.arc(effect.x, effect.y, 30, 0, Math.PI * 2);
+              ctx.arc(effect.x + bird.size/2, effect.y + bird.size/2, 30, 0, Math.PI * 2);
               ctx.stroke();
               break;
             case "stealth":
               ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
               ctx.beginPath();
-              ctx.arc(effect.x, effect.y, 40, 0, Math.PI * 2);
+              ctx.arc(effect.x + bird.size/2, effect.y + bird.size/2, 40, 0, Math.PI * 2);
               ctx.fill();
+              break;
+            case "speedBoost":
+              ctx.strokeStyle = "#3B82F6";
+              ctx.lineWidth = 4;
+              ctx.beginPath();
+              ctx.arc(effect.x + bird.size/2, effect.y + bird.size/2, 35, 0, Math.PI * 2);
+              ctx.stroke();
+              // Add speed lines that follow the bird
+              ctx.strokeStyle = "#60A5FA";
+              ctx.lineWidth = 2;
+              for (let i = 0; i < 3; i++) {
+                ctx.beginPath();
+                ctx.moveTo(effect.x - 40 - i * 10, effect.y + bird.size/2);
+                ctx.lineTo(effect.x - 20 - i * 10, effect.y + bird.size/2);
+                ctx.stroke();
+              }
+              break;
+            case "agilityBoost":
+              ctx.strokeStyle = "#8B5CF6";
+              ctx.lineWidth = 3;
+              ctx.beginPath();
+              ctx.arc(effect.x + bird.size/2, effect.y + bird.size/2, 30, 0, Math.PI * 2);
+              ctx.stroke();
+              // Add agility sparkles that follow the bird
+              ctx.fillStyle = "#A78BFA";
+              for (let i = 0; i < 6; i++) {
+                const angle = (i / 6) * Math.PI * 2;
+                const x = effect.x + bird.size/2 + Math.cos(angle) * 25;
+                const y = effect.y + bird.size/2 + Math.sin(angle) * 25;
+                ctx.beginPath();
+                ctx.arc(x, y, 2, 0, Math.PI * 2);
+                ctx.fill();
+              }
+              break;
+            case "doublePoints":
+              ctx.strokeStyle = "#FBBF24";
+              ctx.lineWidth = 5;
+              ctx.beginPath();
+              ctx.arc(effect.x + bird.size/2, effect.y + bird.size/2, 40, 0, Math.PI * 2);
+              ctx.stroke();
+              // Add coin effect that follows the bird
+              ctx.fillStyle = "#F59E0B";
+              ctx.font = "20px Arial";
+              ctx.textAlign = "center";
+              ctx.fillText("2x", effect.x + bird.size/2, effect.y + bird.size/2 + 5);
+              break;
+            case "rainbowTrail":
+              ctx.strokeStyle = `hsl(${(Date.now() * 0.2) % 360}, 100%, 50%)`;
+              ctx.lineWidth = 4;
+              ctx.beginPath();
+              ctx.arc(effect.x + bird.size/2, effect.y + bird.size/2, 35, 0, Math.PI * 2);
+              ctx.stroke();
+              // Add rainbow particles that follow the bird
+              for (let i = 0; i < 8; i++) {
+                const hue = (i / 8) * 360;
+                ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
+                const angle = (i / 8) * Math.PI * 2;
+                const x = effect.x + bird.size/2 + Math.cos(angle) * 30;
+                const y = effect.y + bird.size/2 + Math.sin(angle) * 25;
+                ctx.beginPath();
+                ctx.arc(x, y, 3, 0, Math.PI * 2);
+                ctx.fill();
+              }
+              break;
+            case "crashThrough":
+              ctx.strokeStyle = "#EF4444";
+              ctx.lineWidth = 6;
+              ctx.beginPath();
+              ctx.arc(effect.x + bird.size/2, effect.y + bird.size/2, 50, 0, Math.PI * 2);
+              ctx.stroke();
+              // Add impact effect that follows the bird
+              ctx.strokeStyle = "#DC2626";
+              ctx.lineWidth = 3;
+              for (let i = 0; i < 4; i++) {
+                const angle = (i / 4) * Math.PI * 2;
+                ctx.beginPath();
+                ctx.moveTo(effect.x + bird.size/2, effect.y + bird.size/2);
+                ctx.lineTo(
+                  effect.x + bird.size/2 + Math.cos(angle) * 60,
+                  effect.y + bird.size/2 + Math.sin(angle) * 60
+                );
+                ctx.stroke();
+              }
+              break;
+            case "miniMode":
+              ctx.strokeStyle = "#10B981";
+              ctx.lineWidth = 3;
+              ctx.beginPath();
+              ctx.arc(effect.x + bird.size/2, effect.y + bird.size/2, 25, 0, Math.PI * 2);
+              ctx.stroke();
+              // Add mini sparkles that follow the bird
+              ctx.fillStyle = "#34D399";
+              for (let i = 0; i < 4; i++) {
+                const angle = (i / 4) * Math.PI * 2;
+                const x = effect.x + bird.size/2 + Math.cos(angle) * 20;
+                const y = effect.y + bird.size/2 + Math.sin(angle) * 20;
+                ctx.beginPath();
+                ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+                ctx.fill();
+              }
               break;
           }
         });
