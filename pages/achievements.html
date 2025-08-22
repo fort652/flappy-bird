@@ -45,28 +45,28 @@
     class="bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 min-h-screen text-white"
   >
     <!-- Header -->
-    <div class="text-center pt-8 pb-6">
-      <h1 class="text-4xl font-bold text-yellow-400 mb-2">Achievements</h1>
-      <p class="text-lg text-gray-300">Unlock your potential!</p>
+    <div class="text-center pt-4 md:pt-8 pb-4 md:pb-6 px-4">
+      <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-yellow-400 mb-2">Achievements</h1>
+      <p class="text-base md:text-lg text-gray-300">Unlock your potential!</p>
     </div>
 
     <!-- Stats Overview -->
-    <div class="mx-4 mb-6 p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
+    <div class="mx-4 mb-6 p-3 md:p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
       <div class="grid grid-cols-2 gap-4 text-center">
         <div>
           <div
-            class="text-2xl font-bold text-yellow-400"
+            class="text-xl md:text-2xl font-bold text-yellow-400"
             id="totalAchievements"
           >
             0
           </div>
-          <div class="text-sm text-gray-300">Unlocked</div>
+          <div class="text-xs md:text-sm text-gray-300">Unlocked</div>
         </div>
         <div>
-          <div class="text-2xl font-bold text-blue-400" id="totalProgress">
+          <div class="text-xl md:text-2xl font-bold text-blue-400" id="totalProgress">
             0%
           </div>
-          <div class="text-sm text-gray-300">Progress</div>
+          <div class="text-xs md:text-sm text-gray-300">Progress</div>
         </div>
       </div>
       <div class="mt-3 bg-gray-700 rounded-full h-2">
@@ -82,31 +82,31 @@
     <div class="mx-4 mb-6">
       <div class="flex gap-2 overflow-x-auto pb-2">
         <button
-          class="category-btn px-4 py-2 bg-yellow-500 text-black rounded-full whitespace-nowrap font-medium"
+          class="category-btn px-3 py-2 md:px-4 md:py-2 bg-yellow-500 text-black rounded-full whitespace-nowrap font-medium text-sm md:text-base"
           data-category="all"
         >
           All
         </button>
         <button
-          class="category-btn px-4 py-2 bg-gray-600 text-white rounded-full whitespace-nowrap"
+          class="category-btn px-3 py-2 md:px-4 md:py-2 bg-gray-600 text-white rounded-full whitespace-nowrap text-sm md:text-base"
           data-category="beginner"
         >
           Beginner
         </button>
         <button
-          class="category-btn px-4 py-2 bg-gray-600 text-white rounded-full whitespace-nowrap"
+          class="category-btn px-3 py-2 md:px-4 md:py-2 bg-gray-600 text-white rounded-full whitespace-nowrap text-sm md:text-base"
           data-category="intermediate"
         >
           Intermediate
         </button>
         <button
-          class="category-btn px-4 py-2 bg-gray-600 text-white rounded-full whitespace-nowrap"
+          class="category-btn px-3 py-2 md:px-4 md:py-2 bg-gray-600 text-white rounded-full whitespace-nowrap text-sm md:text-base"
           data-category="expert"
         >
           Expert
         </button>
         <button
-          class="category-btn px-4 py-2 bg-gray-600 text-white rounded-full whitespace-nowrap"
+          class="category-btn px-3 py-2 md:px-4 md:py-2 bg-gray-600 text-white rounded-full whitespace-nowrap text-sm md:text-base"
           data-category="special"
         >
           Special
@@ -115,28 +115,20 @@
     </div>
 
     <!-- Achievements Grid -->
-    <div class="mx-4 mb-20 grid grid-cols-1 gap-4" id="achievementsGrid">
+    <div class="mx-4 mb-20 grid grid-cols-1 gap-3 md:gap-4" id="achievementsGrid">
       <!-- Achievements will be populated by JavaScript -->
     </div>
 
     <!-- Navigation -->
     <div
-      class="fixed bottom-0 left-0 right-0 bg-gray-900/90 backdrop-blur-sm p-4"
+      class="fixed top-4 left-4 z-50"
     >
-      <div class="flex justify-center gap-4">
-        <button
-          onclick="debugAchievements()"
-          class="bg-purple-600 text-white px-4 py-2 rounded-full text-sm hover:bg-purple-700 transition-colors"
-        >
-          Debug
-        </button>
-        <button
-          onclick="window.location.href='../index.html'"
-          class="bg-blue-600 text-white px-6 py-3 rounded-full font-medium hover:bg-blue-700 transition-colors"
-        >
-          ← Back to Menu
-        </button>
-      </div>
+      <button
+        onclick="window.location.href='../index.html'"
+        class="bg-blue-600 text-white w-12 h-12 rounded-full font-medium hover:bg-blue-700 transition-colors flex items-center justify-center text-xl"
+      >
+        ←
+      </button>
     </div>
 
     <script>
@@ -443,10 +435,10 @@
           // Update active category
           document.querySelectorAll(".category-btn").forEach((btn) => {
             btn.className =
-              "category-btn px-4 py-2 bg-gray-600 text-white rounded-full whitespace-nowrap";
+              "category-btn px-3 py-2 md:px-4 md:py-2 bg-gray-600 text-white rounded-full whitespace-nowrap text-sm md:text-base";
           });
           e.target.className =
-            "category-btn px-4 py-2 bg-yellow-500 text-black rounded-full whitespace-nowrap font-medium";
+            "category-btn px-3 py-2 md:px-4 md:py-2 bg-yellow-500 text-black rounded-full whitespace-nowrap font-medium text-sm md:text-base";
 
           currentCategory = e.target.dataset.category;
           renderAchievements();

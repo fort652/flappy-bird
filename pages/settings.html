@@ -80,118 +80,24 @@
     class="bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900 min-h-screen text-white"
   >
     <!-- Header -->
-    <div class="text-center pt-8 pb-6">
-      <h1 class="text-4xl font-bold text-yellow-400 mb-2">Settings</h1>
-      <p class="text-lg text-gray-300">Customize your game!</p>
-    </div>
-
-    <!-- Game Settings -->
-    <div class="mx-4 mb-6">
-      <div class="setting-card rounded-2xl p-4">
-        <h3 class="text-lg font-semibold mb-4 text-yellow-400">
-          Game Settings
-        </h3>
-
-        <!-- Difficulty -->
-        <div class="flex justify-between items-center mb-4">
-          <div>
-            <div class="font-medium">Difficulty</div>
-            <div class="text-sm text-gray-400">Adjust game challenge level</div>
-          </div>
-          <select
-            id="difficulty"
-            class="bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600"
-          >
-            <option value="easy">Easy</option>
-            <option value="normal">Normal</option>
-            <option value="hard">Hard</option>
-            <option value="extreme">Extreme</option>
-          </select>
-        </div>
-
-        <!-- Pipe Speed -->
-        <div class="mb-4">
-          <div class="flex justify-between items-center mb-2">
-            <div>
-              <div class="font-medium">Pipe Speed</div>
-              <div class="text-sm text-gray-400">How fast pipes move</div>
-            </div>
-            <span class="text-yellow-400 font-medium" id="pipeSpeedValue"
-              >2</span
-            >
-          </div>
-          <input
-            type="range"
-            id="pipeSpeed"
-            class="slider"
-            min="1"
-            max="5"
-            step="0.5"
-            value="2"
-          />
-        </div>
-
-        <!-- Pipe Gap -->
-        <div class="mb-4">
-          <div class="flex justify-between items-center mb-2">
-            <div>
-              <div class="font-medium">Pipe Gap</div>
-              <div class="text-sm text-gray-400">
-                Space between pipe openings
-              </div>
-            </div>
-            <span class="text-yellow-400 font-medium" id="pipeGapValue"
-              >200</span
-            >
-          </div>
-          <input
-            type="range"
-            id="pipeGap"
-            class="slider"
-            min="150"
-            max="300"
-            step="10"
-            value="200"
-          />
-        </div>
-
-        <!-- Gravity -->
-        <div class="mb-4">
-          <div class="flex justify-between items-center mb-2">
-            <div>
-              <div class="font-medium">Gravity</div>
-              <div class="text-sm text-gray-400">How fast bird falls</div>
-            </div>
-            <span class="text-yellow-400 font-medium" id="gravityValue"
-              >0.6</span
-            >
-          </div>
-          <input
-            type="range"
-            id="gravity"
-            class="slider"
-            min="0.3"
-            max="1.2"
-            step="0.1"
-            value="0.6"
-          />
-        </div>
-      </div>
+    <div class="text-center pt-4 md:pt-8 pb-4 md:pb-6 px-4">
+      <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-yellow-400 mb-2">Settings</h1>
+      <p class="text-base md:text-lg text-gray-300">Customize your audio!</p>
     </div>
 
     <!-- Audio Settings -->
     <div class="mx-4 mb-6">
-      <div class="setting-card rounded-2xl p-4">
-        <h3 class="text-lg font-semibold mb-4 text-blue-400">Audio Settings</h3>
+      <div class="setting-card rounded-2xl p-3 md:p-4">
+        <h3 class="text-base md:text-lg font-semibold mb-4 text-blue-400">Audio Settings</h3>
 
         <!-- Master Volume -->
         <div class="mb-4">
           <div class="flex justify-between items-center mb-2">
             <div>
-              <div class="font-medium">Master Volume</div>
-              <div class="text-sm text-gray-400">Overall game volume</div>
+              <div class="font-medium text-sm md:text-base">Master Volume</div>
+              <div class="text-xs md:text-sm text-gray-400">Overall game volume</div>
             </div>
-            <span class="text-blue-400 font-medium" id="masterVolumeValue"
+            <span class="text-blue-400 font-medium text-sm md:text-base" id="masterVolumeValue"
               >80%</span
             >
           </div>
@@ -208,8 +114,8 @@
         <!-- Sound Effects -->
         <div class="flex justify-between items-center mb-4">
           <div>
-            <div class="font-medium">Sound Effects</div>
-            <div class="text-sm text-gray-400">Game action sounds</div>
+            <div class="font-medium text-sm md:text-base">Sound Effects</div>
+            <div class="text-xs md:text-sm text-gray-400">Game action sounds</div>
           </div>
           <div class="toggle-switch" id="soundEffectsToggle"></div>
         </div>
@@ -217,8 +123,8 @@
         <!-- Background Music -->
         <div class="flex justify-between items-center mb-4">
           <div>
-            <div class="font-medium">Background Music</div>
-            <div class="text-sm text-gray-400">Game background tunes</div>
+            <div class="font-medium text-sm md:text-base">Background Music</div>
+            <div class="text-xs md:text-sm text-gray-400">Game background tunes</div>
           </div>
           <div class="toggle-switch" id="bgMusicToggle"></div>
         </div>
@@ -227,10 +133,10 @@
         <div class="mb-4">
           <div class="flex justify-between items-center mb-2">
             <div>
-              <div class="font-medium">Music Volume</div>
-              <div class="text-sm text-gray-400">Background music level</div>
+              <div class="font-medium text-sm md:text-base">Music Volume</div>
+              <div class="text-xs md:text-sm text-gray-400">Background music level</div>
             </div>
-            <span class="text-blue-400 font-medium" id="musicVolumeValue"
+            <span class="text-blue-400 font-medium text-sm md:text-base" id="musicVolumeValue"
               >60%</span
             >
           </div>
@@ -246,122 +152,17 @@
       </div>
     </div>
 
-    <!-- Visual Settings -->
-    <div class="mx-4 mb-6">
-      <div class="setting-card rounded-2xl p-4">
-        <h3 class="text-lg font-semibold mb-4 text-green-400">
-          Visual Settings
-        </h3>
-
-        <!-- Particle Effects -->
-        <div class="flex justify-between items-center mb-4">
-          <div>
-            <div class="font-medium">Particle Effects</div>
-            <div class="text-sm text-gray-400">
-              Visual feedback and sparkles
-            </div>
-          </div>
-          <div class="toggle-switch" id="particlesToggle"></div>
-        </div>
-
-        <!-- Screen Shake -->
-        <div class="flex justify-between items-center mb-4">
-          <div>
-            <div class="font-medium">Screen Shake</div>
-            <div class="text-sm text-gray-400">Camera movement on events</div>
-          </div>
-          <div class="toggle-switch" id="screenShakeToggle"></div>
-        </div>
-
-        <!-- FPS Display -->
-        <div class="flex justify-between items-center mb-4">
-          <div>
-            <div class="font-medium">FPS Display</div>
-            <div class="text-sm text-gray-400">Show frames per second</div>
-          </div>
-          <div class="toggle-switch" id="fpsToggle"></div>
-        </div>
-
-        <!-- Quality -->
-        <div class="flex justify-between items-center mb-4">
-          <div>
-            <div class="font-medium">Graphics Quality</div>
-            <div class="text-sm text-gray-400">Visual detail level</div>
-          </div>
-          <select
-            id="graphicsQuality"
-            class="bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600"
-          >
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <!-- Control Settings -->
-    <div class="mx-4 mb-6">
-      <div class="setting-card rounded-2xl p-4">
-        <h3 class="text-lg font-semibold mb-4 text-purple-400">
-          Control Settings
-        </h3>
-
-        <!-- Touch Sensitivity -->
-        <div class="mb-4">
-          <div class="flex justify-between items-center mb-2">
-            <div>
-              <div class="font-medium">Touch Sensitivity</div>
-              <div class="text-sm text-gray-400">
-                How responsive touch controls are
-              </div>
-            </div>
-            <span class="text-purple-400 font-medium" id="touchSensitivityValue"
-              >Normal</span
-            >
-          </div>
-          <input
-            type="range"
-            id="touchSensitivity"
-            class="slider"
-            min="1"
-            max="5"
-            step="1"
-            value="3"
-          />
-        </div>
-
-        <!-- Vibration -->
-        <div class="flex justify-between items-center mb-4">
-          <div>
-            <div class="font-medium">Vibration</div>
-            <div class="text-sm text-gray-400">Device vibration feedback</div>
-          </div>
-          <div class="toggle-switch" id="vibrationToggle"></div>
-        </div>
-
-        <!-- Auto Flap -->
-        <div class="flex justify-between items-center mb-4">
-          <div>
-            <div class="font-medium">Auto Flap</div>
-            <div class="text-sm text-gray-400">Automatic wing movement</div>
-          </div>
-          <div class="toggle-switch" id="autoFlapToggle"></div>
-        </div>
-      </div>
-    </div>
-
     <!-- Reset & Save -->
-    <div class="mx-4 mb-20 flex gap-4">
+    <div class="mx-4 mb-20 flex flex-col sm:flex-row gap-4">
       <button
         onclick="resetToDefaults()"
-        class="flex-1 bg-red-600 text-white py-3 rounded-xl font-medium hover:bg-red-700 transition-colors"
+        class="flex-1 bg-red-600 text-white py-2 md:py-3 rounded-xl font-medium hover:bg-red-700 transition-colors text-sm md:text-base"
       >
         Reset to Defaults
       </button>
       <button
         onclick="saveSettings()"
-        class="flex-1 bg-green-600 text-white py-3 rounded-xl font-medium hover:bg-green-700 transition-colors"
+        class="flex-1 bg-green-600 text-white py-2 md:py-3 rounded-xl font-medium hover:bg-green-700 transition-colors text-sm md:text-base"
       >
         Save Settings
       </button>
@@ -369,36 +170,23 @@
 
     <!-- Navigation -->
     <div
-      class="fixed bottom-0 left-0 right-0 bg-gray-900/90 backdrop-blur-sm p-4"
+      class="fixed top-4 left-4 z-50"
     >
-      <div class="flex justify-center">
-        <button
-          onclick="window.location.href='../index.html'"
-          class="bg-blue-600 text-white px-6 py-3 rounded-full font-medium hover:bg-blue-700 transition-colors"
-        >
-          ← Back to Menu
-        </button>
-      </div>
+      <button
+        onclick="window.location.href='../index.html'"
+        class="bg-blue-600 text-white w-12 h-12 rounded-full font-medium hover:bg-blue-700 transition-colors flex items-center justify-center text-xl"
+      >
+        ←
+      </button>
     </div>
 
     <script>
       // Default settings
       const defaultSettings = {
-        difficulty: "normal",
-        pipeSpeed: 2,
-        pipeGap: 200,
-        gravity: 0.6,
         masterVolume: 80,
         soundEffects: true,
         bgMusic: true,
         musicVolume: 60,
-        particles: true,
-        screenShake: true,
-        fpsDisplay: false,
-        graphicsQuality: "medium",
-        touchSensitivity: 3,
-        vibration: true,
-        autoFlap: false,
       };
 
       let currentSettings = { ...defaultSettings };
@@ -441,13 +229,6 @@
 
       // Render current settings
       function renderSettings() {
-        // Game settings
-        document.getElementById("difficulty").value =
-          currentSettings.difficulty;
-        document.getElementById("pipeSpeed").value = currentSettings.pipeSpeed;
-        document.getElementById("pipeGap").value = currentSettings.pipeGap;
-        document.getElementById("gravity").value = currentSettings.gravity;
-
         // Audio settings
         document.getElementById("masterVolume").value =
           currentSettings.masterVolume;
@@ -460,77 +241,23 @@
         document.getElementById("musicVolume").value =
           currentSettings.musicVolume;
 
-        // Visual settings
-        document
-          .getElementById("particlesToggle")
-          .classList.toggle("active", currentSettings.particles);
-        document
-          .getElementById("screenShakeToggle")
-          .classList.toggle("active", currentSettings.screenShake);
-        document
-          .getElementById("fpsToggle")
-          .classList.toggle("active", currentSettings.fpsDisplay);
-        document.getElementById("graphicsQuality").value =
-          currentSettings.graphicsQuality;
-
-        // Control settings
-        document.getElementById("touchSensitivity").value =
-          currentSettings.touchSensitivity;
-        document
-          .getElementById("vibrationToggle")
-          .classList.toggle("active", currentSettings.vibration);
-        document
-          .getElementById("autoFlapToggle")
-          .classList.toggle("active", currentSettings.autoFlap);
-
         // Update display values
         updateDisplayValues();
       }
 
       // Update display values
       function updateDisplayValues() {
-        document.getElementById("pipeSpeedValue").textContent =
-          currentSettings.pipeSpeed;
-        document.getElementById("pipeGapValue").textContent =
-          currentSettings.pipeGap;
-        document.getElementById("gravityValue").textContent =
-          currentSettings.gravity;
         document.getElementById(
           "masterVolumeValue"
         ).textContent = `${currentSettings.masterVolume}%`;
         document.getElementById(
           "musicVolumeValue"
         ).textContent = `${currentSettings.musicVolume}%`;
-
-        const sensitivityLabels = [
-          "Very Low",
-          "Low",
-          "Normal",
-          "High",
-          "Very High",
-        ];
-        document.getElementById("touchSensitivityValue").textContent =
-          sensitivityLabels[currentSettings.touchSensitivity - 1];
       }
 
       // Setup event listeners
       function setupEventListeners() {
         // Range inputs
-        document.getElementById("pipeSpeed").addEventListener("input", (e) => {
-          currentSettings.pipeSpeed = parseFloat(e.target.value);
-          updateDisplayValues();
-        });
-
-        document.getElementById("pipeGap").addEventListener("input", (e) => {
-          currentSettings.pipeGap = parseInt(e.target.value);
-          updateDisplayValues();
-        });
-
-        document.getElementById("gravity").addEventListener("input", (e) => {
-          currentSettings.gravity = parseFloat(e.target.value);
-          updateDisplayValues();
-        });
-
         document
           .getElementById("masterVolume")
           .addEventListener("input", (e) => {
@@ -543,26 +270,6 @@
           .addEventListener("input", (e) => {
             currentSettings.musicVolume = parseInt(e.target.value);
             updateDisplayValues();
-          });
-
-        document
-          .getElementById("touchSensitivity")
-          .addEventListener("input", (e) => {
-            currentSettings.touchSensitivity = parseInt(e.target.value);
-            updateDisplayValues();
-          });
-
-        // Select inputs
-        document
-          .getElementById("difficulty")
-          .addEventListener("change", (e) => {
-            currentSettings.difficulty = e.target.value;
-          });
-
-        document
-          .getElementById("graphicsQuality")
-          .addEventListener("change", (e) => {
-            currentSettings.graphicsQuality = e.target.value;
           });
 
         // Toggle switches
@@ -582,49 +289,6 @@
             document
               .getElementById("bgMusicToggle")
               .classList.toggle("active", currentSettings.bgMusic);
-          });
-
-        document
-          .getElementById("particlesToggle")
-          .addEventListener("click", () => {
-            currentSettings.particles = !currentSettings.particles;
-            document
-              .getElementById("particlesToggle")
-              .classList.toggle("active", currentSettings.particles);
-          });
-
-        document
-          .getElementById("screenShakeToggle")
-          .addEventListener("click", () => {
-            currentSettings.screenShake = !currentSettings.screenShake;
-            document
-              .getElementById("screenShakeToggle")
-              .classList.toggle("active", currentSettings.screenShake);
-          });
-
-        document.getElementById("fpsToggle").addEventListener("click", () => {
-          currentSettings.fpsDisplay = !currentSettings.fpsDisplay;
-          document
-            .getElementById("fpsToggle")
-            .classList.toggle("active", currentSettings.fpsDisplay);
-        });
-
-        document
-          .getElementById("vibrationToggle")
-          .addEventListener("click", () => {
-            currentSettings.vibration = !currentSettings.vibration;
-            document
-              .getElementById("vibrationToggle")
-              .classList.toggle("active", currentSettings.vibration);
-          });
-
-        document
-          .getElementById("autoFlapToggle")
-          .addEventListener("click", () => {
-            currentSettings.autoFlap = !currentSettings.autoFlap;
-            document
-              .getElementById("autoFlapToggle")
-              .classList.toggle("active", currentSettings.autoFlap);
           });
       }
 

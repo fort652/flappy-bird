@@ -12,7 +12,159 @@
       }
 
       .game-over {
-        background: rgba(0, 0, 0, 0.8);
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.85));
+        backdrop-filter: blur(20px);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        animation: gameOverSlideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        max-width: 90vw;
+        width: 400px;
+      }
+
+      @keyframes gameOverSlideIn {
+        0% {
+          transform: translate(-50%, -50%) scale(0.8);
+          opacity: 0;
+        }
+        50% {
+          transform: translate(-50%, -50%) scale(1.05);
+        }
+        100% {
+          transform: translate(-50%, -50%) scale(1);
+          opacity: 1;
+        }
+      }
+
+      .game-over h2 {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 3rem;
+        font-weight: 900;
+        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        margin-bottom: 1rem;
+        animation: titlePulse 2s ease-in-out infinite;
+      }
+
+      @keyframes titlePulse {
+        0%, 100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+
+      .final-score {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .score-number {
+        background: linear-gradient(135deg, #10b981, #059669);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 900;
+        font-size: 2rem;
+      }
+
+      .game-over-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        width: 100%;
+      }
+
+      .game-over-button {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        border: none;
+        border-radius: 1rem;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #000;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 25px rgba(251, 191, 36, 0.4);
+      }
+
+      .game-over-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transform: translateX(-100%);
+        transition: transform 0.6s ease;
+      }
+
+      .game-over-button:hover::before {
+        transform: translateX(100%);
+      }
+
+      .game-over-button:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 15px 35px rgba(251, 191, 36, 0.6);
+      }
+
+      .game-over-button:active {
+        transform: translateY(-1px) scale(0.98);
+      }
+
+      .button-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+
+      .button-icon {
+        width: 1.5rem;
+        height: 1.5rem;
+        object-fit: contain;
+      }
+
+      .stats-summary {
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(147, 51, 234, 0.15));
+        border: 1px solid rgba(139, 92, 246, 0.3);
+        border-radius: 1rem;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        backdrop-filter: blur(10px);
+      }
+
+      .stats-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+      }
+
+      .stats-row:last-child {
+        margin-bottom: 0;
+      }
+
+      .stats-label {
+        color: #cbd5e1;
+        font-size: 0.9rem;
+      }
+
+      .stats-value {
+        color: #fbbf24;
+        font-weight: 700;
+        font-size: 1rem;
       }
 
       .countdown-overlay {
@@ -68,13 +220,28 @@
       * {
         -webkit-tap-highlight-color: transparent;
       }
+
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      #gameCanvas {
+        display: block;
+        width: 100vw;
+        height: 100vh;
+        background: linear-gradient(to bottom, #87ceeb 0%, #98fb98 100%);
+      }
     </style>
   </head>
   <body
     class="m-0 p-0 font-sans bg-gradient-to-br from-sky-300 to-green-200 flex justify-center items-center min-h-screen overflow-hidden"
+    style="height: 100vh; min-height: 100vh;"
   >
-    <div class="relative rounded-3xl shadow-2xl overflow-hidden">
-      <canvas id="gameCanvas" class="w-screen h-screen"></canvas>
+    <div class="relative rounded-3xl shadow-2xl overflow-hidden w-full h-full">
+      <canvas id="gameCanvas" class="w-full h-full"></canvas>
 
       <div
         class="absolute inset-0 pointer-events-none flex flex-col justify-between p-5"
@@ -97,39 +264,65 @@
       </div>
 
       <div
-        class="game-over flex flex-col items-center justify-center gap-6 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white p-6 rounded-2xl text-center hidden"
+        class="game-over flex flex-col items-center justify-center gap-6 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white p-8 rounded-2xl text-center hidden"
         id="gameOver"
       >
         <h2 class="text-3xl mb-3 text-red-400">Game Over!</h2>
-        <p class="text-base mb-4">
-          Final Score: <span id="finalScore">0</span>
-        </p>
-        <div class="flex flex-col gap-3">
-          <play-button
-            title="Play Again"
-            route="game.html"
-            image="assets/images/reload.png"
-          ></play-button>
-          <play-button
-            title="Go Home"
-            route="../index.html"
-            image="assets/images/back.png"
-          ></play-button>
+        
+        <div class="final-score">
+          Final Score: <span class="score-number" id="finalScore">0</span>
+        </div>
+
+        <div class="stats-summary">
+          <div class="stats-row">
+            <span class="stats-label">High Score:</span>
+            <span class="stats-value" id="highScoreDisplay">0</span>
+          </div>
+          <div class="stats-row">
+            <span class="stats-label">Games Played:</span>
+            <span class="stats-value" id="gamesPlayedDisplay">0</span>
+          </div>
+          <div class="stats-row">
+            <span class="stats-label">Character:</span>
+            <span class="stats-value" id="characterDisplay">Default</span>
+          </div>
+        </div>
+
+        <div class="game-over-buttons">
+          <button 
+            onclick="restartGame()" 
+            class="game-over-button"
+          >
+            <div class="button-content">
+              <img src="assets/images/reload.png" alt="Restart" class="button-icon">
+              Play Again
+            </div>
+          </button>
+          
+          <button 
+            onclick="goHome()" 
+            class="game-over-button"
+          >
+            <div class="button-content">
+              <img src="assets/images/back.png" alt="Home" class="button-icon">
+              Go Home
+            </div>
+          </button>
         </div>
       </div>
     </div>
 
     <script type="module">
-      import "../components/PlayButton.js";
+      // No longer needed since we're using custom buttons
     </script>
 
     <script>
       let CANVAS_WIDTH, CANVAS_HEIGHT;
-      const GRAVITY = 0.6;
-      const FLAP_SPEED = -8;
+      const GRAVITY = 0.8;
+      const FLAP_SPEED = -10;
       const PIPE_WIDTH = 80;
       const PIPE_GAP = 200;
-      const PIPE_SPEED = 2;
+      const PIPE_SPEED = 5;
       const PIPE_SPAWN_RATE = 2000;
 
       // Game state
@@ -140,7 +333,6 @@
       let score = 0;
       let highScore = localStorage.getItem("flappyBirdHighScore") || 0;
       let gameStartTime = 0;
-      let gameStats = {};
 
       const bird = {
         x: 150,
@@ -160,15 +352,15 @@
       let audioContext;
       let masterVolume = 0.8;
       let soundEffects = true;
-      let bgMusic = true;
-      let musicVolume = 0.6;
       let currentAudioSource = null; // Track current playing audio
       let gameStartAudioSource = null; // Track the game start audio
+      let characterImages = {}; // Cache for character images
 
       function init() {
         canvas = document.getElementById("gameCanvas");
         ctx = canvas.getContext("2d");
 
+        // Set canvas to full viewport dimensions
         CANVAS_WIDTH = window.innerWidth;
         CANVAS_HEIGHT = window.innerHeight;
         canvas.width = CANVAS_WIDTH;
@@ -176,8 +368,10 @@
 
         loadGameSettings();
         loadGameProgress();
+        repairProgressData();
 
         initAudio();
+        preloadCharacterImages();
 
         document.addEventListener("keydown", handleKeyDown);
         canvas.addEventListener("click", handleClick);
@@ -192,81 +386,154 @@
           const settings = JSON.parse(saved);
           masterVolume = settings.masterVolume / 100;
           soundEffects = settings.soundEffects;
-          bgMusic = settings.bgMusic;
-          musicVolume = settings.musicVolume / 100;
         }
       }
 
       function loadGameProgress() {
-        const saved = localStorage.getItem("flappyBirdProgress");
-        if (saved) {
-          const progress = JSON.parse(saved);
-          bird.character = progress.currentCharacter || "default";
-        }
-
+        // First, ensure default unlocks are available
+        ensureDefaultUnlocks();
+        
+        // Load character from localStorage (this is what the characters page saves to)
         const savedCharacter = localStorage.getItem("flappyBirdCharacter");
         if (savedCharacter) {
           bird.character = savedCharacter;
+          console.log(`Loaded saved character: ${savedCharacter}`);
+        } else {
+          // If no character is saved, use default
+          bird.character = "default";
+          console.log(`No character saved, using default: ${bird.character}`);
+          // Save the default character to localStorage
+          localStorage.setItem("flappyBirdCharacter", "default");
         }
+
+        // Also update the progress system to keep it in sync
+        const progress = JSON.parse(
+          localStorage.getItem("flappyBirdProgress") || "{}"
+        );
+        progress.currentCharacter = bird.character;
+        localStorage.setItem("flappyBirdProgress", JSON.stringify(progress));
+        
+        console.log(`Final bird character set to: ${bird.character}`);
+      }
+
+      function ensureDefaultUnlocks() {
+        const progress = JSON.parse(
+          localStorage.getItem("flappyBirdProgress") || "{}"
+        );
+        
+        // Initialize arrays if they don't exist
+        if (!progress.unlockedCharacters) progress.unlockedCharacters = [];
+        if (!progress.unlockedBackgrounds) progress.unlockedBackgrounds = [];
+        
+        // Always ensure default character is unlocked
+        if (!progress.unlockedCharacters.includes("default")) {
+          progress.unlockedCharacters.push("default");
+        }
+        
+        // Always ensure default background is unlocked
+        if (!progress.unlockedBackgrounds.includes("default")) {
+          progress.unlockedBackgrounds.push("default");
+        }
+        
+        // Save the updated progress
+        localStorage.setItem("flappyBirdProgress", JSON.stringify(progress));
+      }
+
+      function repairProgressData() {
+        const progress = JSON.parse(
+          localStorage.getItem("flappyBirdProgress") || "{}"
+        );
+        
+        // Ensure all arrays exist
+        if (!progress.unlockedCharacters) progress.unlockedCharacters = [];
+        if (!progress.unlockedBackgrounds) progress.unlockedBackgrounds = [];
+        if (!progress.unlocked) progress.unlocked = [];
+        
+        // Check for any missing default unlocks
+        const defaultCharacters = ["default"];
+        const defaultBackgrounds = ["default"];
+        
+        // Add any missing default characters
+        defaultCharacters.forEach(char => {
+          if (!progress.unlockedCharacters.includes(char)) {
+            progress.unlockedCharacters.push(char);
+            console.log(`Restored default character: ${char}`);
+          }
+        });
+        
+        // Add any missing default backgrounds
+        defaultBackgrounds.forEach(bg => {
+          if (!progress.unlockedBackgrounds.includes(bg)) {
+            progress.unlockedBackgrounds.push(bg);
+            console.log(`Restored default background: ${bg}`);
+          }
+        });
+        
+        // Save the repaired progress
+        localStorage.setItem("flappyBirdProgress", JSON.stringify(progress));
+        console.log("Progress data repaired:", progress);
+      }
+
+      // Debug function - can be called from browser console
+      function debugProgress() {
+        const progress = localStorage.getItem("flappyBirdProgress");
+        const character = localStorage.getItem("flappyBirdCharacter");
+        const background = localStorage.getItem("flappyBirdBackground");
+        
+        console.log("=== PROGRESS DEBUG ===");
+        console.log("Progress data:", progress ? JSON.parse(progress) : "None");
+        console.log("Selected character:", character);
+        console.log("Selected background:", background);
+        
+        if (progress) {
+          const p = JSON.parse(progress);
+          console.log("Unlocked characters:", p.unlockedCharacters || []);
+          console.log("Unlocked backgrounds:", p.unlockedBackgrounds || []);
+          console.log("Unlocked achievements:", p.unlocked || []);
+        }
+        
+        // Try to repair any issues
+        repairProgressData();
+        
+        console.log("=== END DEBUG ===");
       }
 
       function initAudio() {
         try {
           audioContext = new (window.AudioContext ||
             window.webkitAudioContext)();
-          
-          testMP3Load();
         } catch (e) {
           console.log("Audio not supported");
         }
       }
 
-      function testMP3Load() {
-        fetch("assets/sounds/8bit1.mp3")
-          .then(response => {
-            console.log("MP3 test - Status:", response.status, "OK:", response.ok);
-            if (response.ok) {
-              console.log("MP3 file is accessible");
-            } else {
-              console.error("MP3 file not accessible:", response.status);
-            }
-          })
-          .catch(error => {
-            console.error("MP3 test failed:", error);
-          });
-      }
+      function preloadCharacterImages() {
+        const characters = [
+          { id: "default", path: "assets/images/tweety.png" },
+          { id: "blue", path: "assets/images/blue-bird.png" },
+          { id: "purple", path: "assets/images/purple-bird.png" },
+          { id: "golden", path: "assets/images/tweety.png" }, // Using tweety as placeholder
+          { id: "rainbow", path: "assets/images/tweety.png" }, // Using tweety as placeholder
+          { id: "ninja", path: "assets/images/tweety.png" }, // Using tweety as placeholder
+          { id: "giant", path: "assets/images/tweety.png" }, // Using tweety as placeholder
+          { id: "mini", path: "assets/images/tweety.png" } // Using tweety as placeholder
+        ];
 
-      function playSound(frequency, duration, type = "sine") {
-        if (!soundEffects || !audioContext) return;
-
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-
-        oscillator.type = type;
-        oscillator.frequency.setValueAtTime(
-          frequency,
-          audioContext.currentTime
-        );
-
-        gainNode.gain.setValueAtTime(
-          0.1 * masterVolume,
-          audioContext.currentTime
-        );
-        gainNode.gain.exponentialRampToValueAtTime(
-          0.01,
-          audioContext.currentTime + duration
-        );
-
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + duration);
+        characters.forEach(char => {
+          const img = new Image();
+          img.onload = () => {
+            characterImages[char.id] = img;
+            console.log(`Character image loaded: ${char.id}`);
+          };
+          img.onerror = () => {
+            console.log(`Failed to load character image: ${char.path}`);
+          };
+          img.src = char.path;
+        });
       }
 
       function playMP3Sound(audioPath, onSourceCreated = null) {
         if (!soundEffects || !audioContext) {
-          console.log("Sound effects disabled or audio context not available");
           return null;
         }
 
@@ -274,26 +541,18 @@
           audioContext.resume();
         }
 
-        console.log("Attempting to play MP3:", audioPath);
-
         // Stop any currently playing audio before starting new one
         stopCurrentAudio();
 
         fetch(audioPath)
           .then(response => {
-            console.log("Fetch response status:", response.status);
             if (!response.ok) {
               throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.arrayBuffer();
           })
-          .then(arrayBuffer => {
-            console.log("Audio file loaded, size:", arrayBuffer.byteLength);
-            return audioContext.decodeAudioData(arrayBuffer);
-          })
+          .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
           .then(audioBuffer => {
-            console.log("Audio decoded successfully, duration:", audioBuffer.duration);
-            
             const source = audioContext.createBufferSource();
             const gainNode = audioContext.createGain();
 
@@ -308,7 +567,6 @@
             );
 
             source.start();
-            console.log("MP3 sound started playing:", audioPath);
             
             // Store the audio source for potential stopping
             currentAudioSource = source;
@@ -319,56 +577,39 @@
             }
           })
           .catch(error => {
-            console.error("Error loading audio file:", error);
-            console.log("Falling back to generated sound");
+            // Audio loading failed, continue without sound
           });
       }
 
       function stopCurrentAudio() {
         if (currentAudioSource) {
           try {
-            console.log("Stopping current audio source");
             currentAudioSource.stop();
             currentAudioSource = null;
-            console.log("Current audio stopped successfully");
           } catch (error) {
-            console.log("Current audio already stopped or finished:", error.message);
             currentAudioSource = null;
           }
-        } else {
-          console.log("No current audio source to stop");
         }
       }
 
       function stopGameStartAudio() {
         if (gameStartAudioSource) {
           try {
-            console.log("Stopping game start audio source");
             gameStartAudioSource.stop();
             gameStartAudioSource = null;
-            console.log("Game start audio stopped successfully");
           } catch (error) {
-            console.log("Game start audio already stopped or finished:", error.message);
             gameStartAudioSource = null;
           }
-        } else {
-          console.log("No game start audio source to stop");
         }
       }
 
       function stopAllAudio() {
-        console.log("Stopping all audio sources");
         stopCurrentAudio();
         stopGameStartAudio();
       }
 
-      function forcePlayAudio(audioPath) {
-        console.log("Force playing audio:", audioPath);
-        stopAllAudio();
-        playMP3Sound(audioPath);
-      }
-
       function handleResize() {
+        // Update canvas dimensions on window resize
         CANVAS_WIDTH = window.innerWidth;
         CANVAS_HEIGHT = window.innerHeight;
         canvas.width = CANVAS_WIDTH;
@@ -377,13 +618,10 @@
 
       function startGame() {
         if (audioContext && audioContext.state === 'suspended') {
-          audioContext.resume().then(() => {
-            console.log("Audio context resumed");
-          });
+          audioContext.resume();
         }
 
         // Stop any currently playing audio when starting a new game
-        console.log("Starting new game - stopping all audio");
         stopAllAudio();
 
         gameRunning = false;
@@ -433,15 +671,12 @@
         if (countdownValue > 0) {
           countdownNumber.textContent = countdownValue;
           countdownText.textContent = "Get Ready!";
-
         } else {
           countdownNumber.textContent = "GO!";
           countdownText.textContent = "Start Flying!";
 
           // Play game start sound and track the source
-          console.log("Playing game start sound (8bit1)");
           playMP3Sound("assets/sounds/8bit1.mp3", (source) => {
-            console.log("Game start audio source created:", source);
             gameStartAudioSource = source;
           });
         }
@@ -707,11 +942,33 @@
 
         saveGameStats(score, gameDuration, distance);
 
+        // Update all display elements
         document.getElementById("finalScore").textContent = score;
+        document.getElementById("highScoreDisplay").textContent = highScore;
+        
+        // Get and display games played
+        const stats = JSON.parse(localStorage.getItem("flappyBirdStats") || "{}");
+        const gamesPlayed = stats.gamesPlayed || 0;
+        document.getElementById("gamesPlayedDisplay").textContent = gamesPlayed;
+        
+        // Get and display character name
+        const characterNames = {
+          "default": "Default Bird",
+          "blue": "Blue Bird",
+          "purple": "Purple Bird",
+          "golden": "Golden Bird",
+          "rainbow": "Rainbow Bird",
+          "ninja": "Ninja Bird",
+          "giant": "Giant Bird",
+          "mini": "Mini Bird"
+        };
+        const characterName = characterNames[bird.character] || "Default Bird";
+        document.getElementById("characterDisplay").textContent = characterName;
+
+        // Show the enhanced game over screen
         document.getElementById("gameOver").style.display = "block";
 
         // Stop any current audio and play game over sound
-        console.log("Game over - stopping current audio and playing 8bit3");
         stopAllAudio();
         playMP3Sound("assets/sounds/8bit3.mp3");
       }
@@ -817,21 +1074,31 @@
         }
       }
 
-      function renderBird() {
+      function renderBird(includeSpecialEffects = true) {
         ctx.save();
         ctx.globalCompositeOperation = "source-over";
 
         let effectiveSize = bird.size;
         let effectiveColor = bird.color;
+        let useImage = false;
+        let characterImage = null;
 
+        console.log(`Rendering bird with character: ${bird.character}`);
+        console.log(`Available character images:`, Object.keys(characterImages));
+
+        // Try to load character image if available
         switch (bird.character) {
           case "blue":
             effectiveColor = "#3B82F6";
             effectiveSize *= 0.9;
+            useImage = true;
+            characterImage = "assets/images/blue-bird.png";
             break;
           case "purple":
             effectiveColor = "#8B5CF6";
             effectiveSize *= 0.8;
+            useImage = true;
+            characterImage = "assets/images/purple-bird.png";
             break;
           case "mini":
             effectiveSize *= 0.6;
@@ -839,14 +1106,49 @@
           case "giant":
             effectiveSize *= 1.5;
             break;
+          default:
+            useImage = true;
+            characterImage = "assets/images/tweety.png";
+            break;
         }
 
-        ctx.fillStyle = effectiveColor;
+        if (useImage && characterImage) {
+          const cachedImage = characterImages[bird.character];
+          if (cachedImage) {
+            console.log(`Using cached image for ${bird.character}`);
+            // Use cached image for better performance
+            ctx.drawImage(
+              cachedImage,
+              bird.x,
+              bird.y,
+              effectiveSize,
+              effectiveSize
+            );
+          } else {
+            console.log(`No cached image for ${bird.character}, using fallback`);
+            // Fallback to basic shape if image not cached
+            renderBasicBird(effectiveSize, effectiveColor);
+          }
+        } else {
+          console.log(`Using basic shape for ${bird.character}`);
+          // Use basic shape for characters without images
+          renderBasicBird(effectiveSize, effectiveColor);
+        }
+
+        if (includeSpecialEffects) {
+          renderSpecialEffects();
+        }
+
+        ctx.restore();
+      }
+
+      function renderBasicBird(size, color) {
+        ctx.fillStyle = color;
         ctx.beginPath();
         ctx.arc(
-          bird.x + effectiveSize / 2,
-          bird.y + effectiveSize / 2,
-          effectiveSize / 2,
+          bird.x + size / 2,
+          bird.y + size / 2,
+          size / 2,
           0,
           Math.PI * 2
         );
@@ -855,8 +1157,8 @@
         ctx.fillStyle = "#000";
         ctx.beginPath();
         ctx.arc(
-          bird.x + effectiveSize * 0.7,
-          bird.y + effectiveSize * 0.3,
+          bird.x + size * 0.7,
+          bird.y + size * 0.3,
           3,
           0,
           Math.PI * 2
@@ -866,8 +1168,8 @@
         ctx.fillStyle = "#FFA500";
         ctx.beginPath();
         ctx.ellipse(
-          bird.x + effectiveSize * 0.3,
-          bird.y + effectiveSize * 0.5,
+          bird.x + size * 0.3,
+          bird.y + size * 0.5,
           8,
           4,
           Math.PI / 4,
@@ -875,10 +1177,6 @@
           Math.PI * 2
         );
         ctx.fill();
-
-        renderSpecialEffects();
-
-        ctx.restore();
       }
 
       function renderSpecialEffects() {
@@ -924,10 +1222,12 @@
       function renderBackground() {
         const selectedBackground =
           localStorage.getItem("flappyBirdBackground") || "default";
-        const backgroundImage = new Image();
-        backgroundImage.src = `assets/images/${selectedBackground}.jpg`;
-
+        
+        // Fill the entire canvas with background
         ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        
+        // Draw clouds
         for (let i = 0; i < 5; i++) {
           const x = ((Date.now() * 0.02 + i * 200) % (CANVAS_WIDTH + 100)) - 50;
           const y = 50 + i * 80;
@@ -967,65 +1267,7 @@
       }
 
       function renderBirdStatic() {
-        let effectiveSize = bird.size;
-        let effectiveColor = bird.color;
-
-        switch (bird.character) {
-          case "blue":
-            effectiveColor = "#3B82F6";
-            effectiveSize *= 0.9;
-            break;
-          case "purple":
-            effectiveColor = "#8B5CF6";
-            effectiveSize *= 0.8;
-            break;
-          case "mini":
-            effectiveSize *= 0.6;
-            break;
-          case "giant":
-            effectiveSize *= 1.5;
-            break;
-        }
-
-        ctx.save();
-        ctx.globalCompositeOperation = "source-over";
-
-        ctx.fillStyle = effectiveColor;
-        ctx.beginPath();
-        ctx.arc(
-          bird.x + effectiveSize / 2,
-          bird.y + effectiveSize / 2,
-          effectiveSize / 2,
-          0,
-          Math.PI * 2
-        );
-        ctx.fill();
-
-        ctx.fillStyle = "#000";
-        ctx.beginPath();
-        ctx.arc(
-          bird.x + effectiveSize * 0.7,
-          bird.y + effectiveSize * 0.3,
-          3,
-          0,
-          Math.PI * 2
-        );
-        ctx.fill();
-
-        ctx.fillStyle = "#FFA500";
-        ctx.beginPath();
-        ctx.ellipse(
-          bird.x + effectiveSize * 0.3,
-          bird.y + effectiveSize * 0.5,
-          8,
-          4,
-          Math.PI / 4,
-          0,
-          Math.PI * 2
-        );
-        ctx.fill();
-
-        ctx.restore();
+        renderBird(false);
       }
 
       function renderCountdown() {

@@ -16,12 +16,15 @@
       class="relative w-screen h-screen background-image"
       id="mainBackground"
     >
-      <div class="text-center mt-16">
-        <h1 class="text-yellow-400 text-[100px] font-bold">Tweety Bird</h1>
-        <p class="text-white text-[60px] font-medium">High Score:</p>
+      <!-- Header -->
+      <div class="text-center mt-8 md:mt-16 px-4">
+        <h1 class="text-yellow-400 text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[100px] font-bold">Tweety Bird</h1>
+        <p class="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-[60px] font-medium">High Score:</p>
+        <div class="text-white text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[80px] font-bold text-yellow-400" id="highScoreDisplay">0</div>
       </div>
 
-      <div class="flex flex-col gap-6 ml-10 mt-32">
+      <!-- Menu Buttons -->
+      <div class="flex flex-col gap-4 md:gap-6 mx-4 md:ml-10 mt-16 md:mt-32">
         <game-button
           title="Achievements"
           route="pages/achievements.html"
@@ -45,37 +48,28 @@
         <game-button
           title="Characters"
           route="pages/characters.html"
-          image="assets/images/tweety.png"
+          image=""
+          id="characterButton"
         ></game-button>
       </div>
 
-      <div class="flex justify-center mt-32">
+      <!-- Play Button -->
+      <div class="flex justify-center mt-16 md:mt-32">
         <play-button
           title="Play"
           route="game.html"
           image="assets/images/play.png"
         ></play-button>
       </div>
+
+      <!-- Navigation -->
       <div
-        class="flex justify-between px-10 relative bottom-0 left-0 right-0 mt-32"
+        class="flex justify-center px-4 md:px-10 relative bottom-0 left-0 right-0 mt-16 md:mt-32"
       >
         <button
-          class="bg-blue-500 rounded-full w-[100px] h-[100px] flex items-center justify-center cursor-pointer transition-all duration-300 ease-in-out hover:scale-110"
+          class="bg-blue-500 rounded-full w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-[100px] lg:h-[100px] flex items-center justify-center cursor-pointer text-white text-xl font-bold hover:bg-blue-600 transition-colors"
         >
-          <img
-            src="assets/images/back.png"
-            alt="Back"
-            class="w-[100px] h-[100px] object-contain"
-          />
-        </button>
-        <button
-          class="bg-red-500 rounded-full w-[100px] h-[100px] flex flex-col items-center justify-center cursor-pointer transition-all duration-300 ease-in-out hover:scale-110 text-white text-xs font-bold"
-        >
-          <img
-            src="assets/images/reset.png"
-            alt="Reset"
-            class="w-[100px] h-[100px] object-contain"
-          />
+          ←
         </button>
       </div>
     </div>
@@ -111,16 +105,55 @@
         });
       }
 
-      window.addEventListener("load", loadSelectedBackground);
+      function loadHighScore() {
+        const highScore = localStorage.getItem("flappyBirdHighScore") || 0;
+        const highScoreDisplay = document.getElementById("highScoreDisplay");
+        if (highScoreDisplay) {
+          highScoreDisplay.textContent = highScore;
+        }
+      }
+
+      function updateCharacterButton() {
+        const characterButton = document.getElementById("characterButton");
+        if (characterButton && characterButton.loadSelectedCharacter) {
+          const isInPagesFolder = window.location.pathname.includes("/pages/");
+          const assetsPath = isInPagesFolder ? "../" : "";
+          characterButton.loadSelectedCharacter(assetsPath);
+        }
+      }
+
+      function refreshCharacterDisplay() {
+        // Force refresh of character button
+        setTimeout(() => {
+          updateCharacterButton();
+        }, 100);
+      }
+
+      window.addEventListener("load", () => {
+        loadSelectedBackground();
+        loadHighScore();
+        updateCharacterButton();
+      });
 
       window.addEventListener("storage", function (e) {
         if (e.key === "flappyBirdBackground") {
           loadSelectedBackground();
         }
+        if (e.key === "flappyBirdHighScore") {
+          loadHighScore();
+        }
+        if (e.key === "flappyBirdCharacter") {
+          updateCharacterButton();
+        }
       });
 
       window.addEventListener("backgroundChanged", function (e) {
         loadSelectedBackground();
+      });
+
+      // Listen for character changes from other pages
+      window.addEventListener("characterChanged", function (e) {
+        refreshCharacterDisplay();
       });
     </script>
   </body>

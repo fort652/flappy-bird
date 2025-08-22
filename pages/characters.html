@@ -61,22 +61,22 @@
     class="bg-gradient-to-br from-yellow-900 via-orange-900 to-red-900 min-h-screen text-white"
   >
     <!-- Header -->
-    <div class="text-center pt-8 pb-6">
-      <h1 class="text-4xl font-bold text-yellow-400 mb-2">Characters</h1>
-      <p class="text-lg text-gray-300">Choose your bird!</p>
+    <div class="text-center pt-4 md:pt-8 pb-4 md:pb-6 px-4">
+      <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-yellow-400 mb-2">Characters</h1>
+      <p class="text-base md:text-lg text-gray-300">Choose your bird!</p>
     </div>
 
     <!-- Current Character Preview -->
     <div class="mx-4 mb-6">
-      <div class="setting-card rounded-2xl p-4 text-center">
-        <h3 class="text-lg font-semibold mb-3">Current Character</h3>
+      <div class="setting-card rounded-2xl p-3 md:p-4 text-center">
+        <h3 class="text-base md:text-lg font-semibold mb-3">Current Character</h3>
         <div
-          class="character-image w-24 h-24 mx-auto mb-3"
+          class="character-image w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-3"
           id="currentCharacterImage"
         >
           <!-- Current character will be displayed here -->
         </div>
-        <p class="text-sm text-gray-300" id="currentCharacterName">
+        <p class="text-xs md:text-sm text-gray-300" id="currentCharacterName">
           Default Bird
         </p>
       </div>
@@ -86,31 +86,31 @@
     <div class="mx-4 mb-6">
       <div class="flex gap-2 overflow-x-auto pb-2">
         <button
-          class="category-btn px-4 py-2 bg-yellow-500 text-black rounded-full whitespace-nowrap font-medium"
+          class="category-btn px-3 py-2 md:px-4 md:py-2 bg-yellow-500 text-black rounded-full whitespace-nowrap font-medium text-sm md:text-base"
           data-category="all"
         >
           All
         </button>
         <button
-          class="category-btn px-4 py-2 bg-gray-600 text-white rounded-full whitespace-nowrap"
+          class="category-btn px-3 py-2 md:px-4 md:py-2 bg-gray-600 text-white rounded-full whitespace-nowrap text-sm md:text-base"
           data-category="starter"
         >
           Starter
         </button>
         <button
-          class="category-btn px-4 py-2 bg-gray-600 text-white rounded-full whitespace-nowrap"
+          class="category-btn px-3 py-2 md:px-4 md:py-2 bg-gray-600 text-white rounded-full whitespace-nowrap text-sm md:text-base"
           data-category="advanced"
         >
           Advanced
         </button>
         <button
-          class="category-btn px-4 py-2 bg-gray-600 text-white rounded-full whitespace-nowrap"
+          class="category-btn px-3 py-2 md:px-4 md:py-2 bg-gray-600 text-white rounded-full whitespace-nowrap text-sm md:text-base"
           data-category="legendary"
         >
           Legendary
         </button>
         <button
-          class="category-btn px-4 py-2 bg-gray-600 text-white rounded-full whitespace-nowrap"
+          class="category-btn px-3 py-2 md:px-4 md:py-2 bg-gray-600 text-white rounded-full whitespace-nowrap text-sm md:text-base"
           data-category="special"
         >
           Special
@@ -119,22 +119,20 @@
     </div>
 
     <!-- Characters Grid -->
-    <div class="mx-4 mb-20 grid grid-cols-1 gap-4" id="charactersGrid">
+    <div class="mx-4 mb-20 grid grid-cols-1 gap-3 md:gap-4" id="charactersGrid">
       <!-- Characters will be populated by JavaScript -->
     </div>
 
     <!-- Navigation -->
     <div
-      class="fixed bottom-0 left-0 right-0 bg-gray-900/90 backdrop-blur-sm p-4"
+      class="fixed top-4 left-4 z-50"
     >
-      <div class="flex justify-center">
-        <button
-          onclick="window.location.href='../index.html'"
-          class="bg-blue-600 text-white px-6 py-3 rounded-full font-medium hover:bg-blue-700 transition-colors"
-        >
-          ← Back to Menu
-        </button>
-      </div>
+      <button
+        onclick="window.location.href='../index.html'"
+        class="bg-blue-600 text-white w-12 h-12 rounded-full font-medium hover:bg-blue-700 transition-colors flex items-center justify-center text-xl"
+      >
+        ←
+      </button>
     </div>
 
     <script>
@@ -300,7 +298,15 @@
         const saved = localStorage.getItem("flappyBirdCharacter");
         if (saved) {
           currentCharacter = saved;
+        } else {
+          // If no character is saved, use default
+          currentCharacter = "default";
+          // Save the default character to localStorage
+          localStorage.setItem("flappyBirdCharacter", "default");
         }
+        
+        // Update the display immediately
+        updateCurrentCharacter();
       }
 
       // Save current character
@@ -416,6 +422,13 @@
         saveCurrentCharacter();
         updateCurrentCharacter();
         renderCharacters();
+
+        // Dispatch custom event to notify other pages
+        window.dispatchEvent(
+          new CustomEvent("characterChanged", {
+            detail: { character: characterId },
+          })
+        );
       }
 
       // Category filter

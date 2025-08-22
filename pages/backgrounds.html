@@ -9,70 +9,194 @@
       .background-card {
         background: linear-gradient(
           135deg,
-          rgba(255, 255, 255, 0.1),
-          rgba(255, 255, 255, 0.05)
+          rgba(255, 255, 255, 0.15),
+          rgba(255, 255, 255, 0.08)
         );
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        transition: all 0.3s ease;
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .background-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transform: translateX(-100%);
+        transition: transform 0.6s ease;
+      }
+
+      .background-card:hover::before {
+        transform: translateX(100%);
       }
 
       .background-card:hover {
-        transform: translateY(-2px);
+        transform: translateY(-4px) scale(1.02);
         border-color: rgba(255, 255, 255, 0.4);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
       }
 
       .background-card.selected {
         border-color: #fbbf24;
-        box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+        box-shadow: 0 0 30px rgba(251, 191, 36, 0.6), 0 10px 30px rgba(0, 0, 0, 0.3);
+        background: linear-gradient(
+          135deg,
+          rgba(251, 191, 36, 0.1),
+          rgba(255, 255, 255, 0.12)
+        );
       }
 
       .background-card.locked {
         filter: grayscale(100%) brightness(0.4);
+        opacity: 0.7;
       }
 
       .background-preview {
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .background-preview::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+        pointer-events: none;
       }
 
       .unlock-badge {
         background: linear-gradient(135deg, #fbbf24, #f59e0b);
         animation: pulse 2s infinite;
+        box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
+      }
+
+      .category-btn {
+        transition: all 0.3s ease;
+      }
+
+      .category-btn:hover {
+        transform: translateY(-1px);
+      }
+
+      .category-btn.active {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        color: #000;
+        box-shadow: 0 8px 25px rgba(251, 191, 36, 0.4);
+        transform: translateY(-2px);
+        border-color: rgba(251, 191, 36, 0.6);
+        font-weight: 700;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      }
+
+      .category-btn:not(.active) {
+        background: linear-gradient(135deg, rgba(75, 85, 99, 0.8), rgba(55, 65, 81, 0.9));
+        color: #e5e7eb;
+        border-color: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .category-btn:not(.active):hover {
+        background: linear-gradient(135deg, rgba(75, 85, 99, 0.9), rgba(55, 65, 81, 1));
+        color: #ffffff;
+        border-color: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      .category-btn:active {
+        transform: translateY(0);
+        transition: transform 0.1s ease;
       }
 
       @keyframes pulse {
-        0%,
-        100% {
+        0%, 100% {
           opacity: 1;
+          transform: scale(1);
         }
         50% {
-          opacity: 0.7;
+          opacity: 0.8;
+          transform: scale(1.05);
+        }
+      }
+
+      .current-bg-card {
+        background: linear-gradient(
+          135deg,
+          rgba(139, 92, 246, 0.2),
+          rgba(147, 51, 234, 0.15)
+        );
+        border: 2px solid rgba(139, 92, 246, 0.4);
+        box-shadow: 0 0 40px rgba(139, 92, 246, 0.3);
+      }
+
+      .floating-particles {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 50%;
+        animation: float 6s infinite linear;
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(100vh) rotate(0deg);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-100px) rotate(360deg);
+          opacity: 0;
         }
       }
     </style>
   </head>
   <body
-    class="bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 min-h-screen text-white"
+    class="bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 min-h-screen text-white relative overflow-x-hidden"
   >
+    <!-- Floating Particles Background -->
+    <div class="floating-particles" id="particles"></div>
+
     <!-- Header -->
-    <div class="text-center pt-8 pb-6">
-      <h1 class="text-4xl font-bold text-yellow-400 mb-2">Backgrounds</h1>
-      <p class="text-lg text-gray-300">Customize your experience!</p>
+    <div class="text-center pt-4 md:pt-8 pb-4 md:pb-6 px-4 relative z-10">
+      <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-yellow-400 mb-2 drop-shadow-lg">Backgrounds</h1>
+      <p class="text-base md:text-lg text-gray-300 drop-shadow-md">Customize your experience!</p>
     </div>
 
     <!-- Current Background Preview -->
-    <div class="mx-4 mb-6">
-      <div class="stat-card rounded-2xl p-4 text-center">
-        <h3 class="text-lg font-semibold mb-3">Current Background</h3>
+    <div class="mx-4 mb-6 relative z-10">
+      <div class="current-bg-card rounded-2xl p-3 md:p-4 text-center backdrop-blur-sm">
+        <h3 class="text-base md:text-lg font-semibold mb-3 text-purple-200">Current Background</h3>
         <div
-          class="background-preview w-full h-32 rounded-xl mb-3"
+          class="background-preview w-full h-24 md:h-40 rounded-xl mb-3"
           id="currentBackground"
         >
           <!-- Current background will be displayed here -->
         </div>
-        <p class="text-sm text-gray-300" id="currentBackgroundName">Default</p>
+        <p class="text-xs md:text-sm text-purple-200 font-medium" id="currentBackgroundName">Default</p>
       </div>
     </div>
 
@@ -80,31 +204,31 @@
     <div class="mx-4 mb-6">
       <div class="flex gap-2 overflow-x-auto pb-2">
         <button
-          class="category-btn px-4 py-2 bg-yellow-500 text-black rounded-full whitespace-nowrap font-medium"
+          class="category-btn px-3 py-2 md:px-4 md:py-2 bg-yellow-500 text-black rounded-full whitespace-nowrap font-medium text-sm md:text-base"
           data-category="all"
         >
           All
         </button>
         <button
-          class="category-btn px-4 py-2 bg-gray-600 text-white rounded-full whitespace-nowrap"
+          class="category-btn px-3 py-2 md:px-4 md:py-2 bg-gray-600 text-white rounded-full whitespace-nowrap font-sm md:text-base"
           data-category="nature"
         >
           Nature
         </button>
         <button
-          class="category-btn px-4 py-2 bg-gray-600 text-white rounded-full whitespace-nowrap"
+          class="category-btn px-3 py-2 md:px-4 md:py-2 bg-gray-600 text-white rounded-full whitespace-nowrap font-sm md:text-base"
           data-category="urban"
         >
           Urban
         </button>
         <button
-          class="category-btn px-4 py-2 bg-gray-600 text-white rounded-full whitespace-nowrap"
+          class="category-btn px-3 py-2 md:px-4 md:py-2 bg-gray-600 text-white rounded-full whitespace-nowrap font-sm md:text-base"
           data-category="space"
         >
           Space
         </button>
         <button
-          class="category-btn px-4 py-2 bg-gray-600 text-white rounded-full whitespace-nowrap"
+          class="category-btn px-3 py-2 md:px-4 md:py-2 bg-gray-600 text-white rounded-full whitespace-nowrap font-sm md:text-base"
           data-category="seasons"
         >
           Seasons
@@ -113,22 +237,20 @@
     </div>
 
     <!-- Backgrounds Grid -->
-    <div class="mx-4 mb-20 grid grid-cols-2 gap-4" id="backgroundsGrid">
+    <div class="mx-4 mb-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 relative z-10" id="backgroundsGrid">
       <!-- Backgrounds will be populated by JavaScript -->
     </div>
 
     <!-- Navigation -->
     <div
-      class="fixed bottom-0 left-0 right-0 bg-gray-900/90 backdrop-blur-sm p-4"
+      class="fixed top-4 left-4 z-50"
     >
-      <div class="flex justify-center">
-        <button
-          onclick="window.location.href='../index.html'"
-          class="bg-blue-600 text-white px-6 py-3 rounded-full font-medium hover:bg-blue-700 transition-colors"
-        >
-          ← Back to Menu
-        </button>
-      </div>
+      <button
+        onclick="window.location.href='../index.html'"
+        class="bg-blue-600 text-white w-12 h-12 rounded-full font-medium hover:bg-blue-700 transition-colors flex items-center justify-center text-xl"
+      >
+        ←
+      </button>
     </div>
 
     <script>
@@ -273,12 +395,39 @@
         localStorage.setItem("flappyBirdProgress", JSON.stringify(progress));
       }
 
-      // Load current background
+      // Update current background preview
+      function updateCurrentBackground() {
+        const background = backgrounds.find(
+          (bg) => bg.id === currentBackground
+        );
+        const preview = document.getElementById("currentBackground");
+        const name = document.getElementById("currentBackgroundName");
+
+        if (background) {
+          // Test if the image loads successfully
+          const img = new Image();
+          img.onload = function() {
+            preview.style.backgroundImage = `url(${background.image})`;
+            name.textContent = background.name;
+          };
+          img.onerror = function() {
+            // Fallback to default if image fails to load
+            console.log(`Background image not found: ${background.image}, using fallback`);
+            preview.style.backgroundImage = "none";
+            preview.style.backgroundColor = "rgba(139, 92, 246, 0.3)";
+            name.textContent = background.name + " (Image not available)";
+          };
+          img.src = background.image;
+        }
+      }
+
+      // Load current background from localStorage
       function loadCurrentBackground() {
         const saved = localStorage.getItem("flappyBirdBackground");
         if (saved) {
           currentBackground = saved;
         }
+        updateCurrentBackground();
       }
 
       // Save current background
@@ -291,20 +440,6 @@
         );
         progress.currentBackground = currentBackground;
         localStorage.setItem("flappyBirdProgress", JSON.stringify(progress));
-      }
-
-      // Update current background preview
-      function updateCurrentBackground() {
-        const background = backgrounds.find(
-          (bg) => bg.id === currentBackground
-        );
-        const preview = document.getElementById("currentBackground");
-        const name = document.getElementById("currentBackgroundName");
-
-        if (background) {
-          preview.style.backgroundImage = `url(${background.image})`;
-          name.textContent = background.name;
-        }
       }
 
       // Render backgrounds grid
@@ -325,7 +460,7 @@
             isSelected ? "selected" : ""
           } ${!isUnlocked ? "locked" : ""}" 
                onclick="selectBackground('${background.id}')">
-            <div class="background-preview w-full h-24 rounded-lg mb-3" 
+            <div class="background-preview w-full h-32 rounded-lg mb-3" 
                  style="background-image: url(${background.image})"></div>
             <div class="text-center">
               <h3 class="font-semibold text-sm mb-1 ${
@@ -415,6 +550,27 @@
 
       // Initialize on load
       window.addEventListener("load", initBackgrounds);
+
+      // Create floating particles effect
+      function createParticles() {
+        const particlesContainer = document.getElementById("particles");
+        const particleCount = 15;
+
+        for (let i = 0; i < particleCount; i++) {
+          const particle = document.createElement("div");
+          particle.className = "particle";
+          particle.style.left = Math.random() * 100 + "%";
+          particle.style.animationDelay = Math.random() * 6 + "s";
+          particle.style.animationDuration = (Math.random() * 3 + 4) + "s";
+          particlesContainer.appendChild(particle);
+        }
+      }
+
+      // Initialize particles on load
+      window.addEventListener("load", () => {
+        initBackgrounds();
+        createParticles();
+      });
     </script>
   </body>
 </html>
