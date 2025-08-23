@@ -28,22 +28,22 @@
         <game-button
           title="Achievements"
           route="pages/achievements.html"
-          image="assets/images/achievement.png"
+          image="assets/images/buttons/menu/achievement.png"
         ></game-button>
         <game-button
           title="Statistics"
           route="pages/stats.html"
-          image="assets/images/pie-chart.png"
+          image="assets/images/buttons/menu/pie-chart.png"
         ></game-button>
         <game-button
           title="Background"
           route="pages/backgrounds.html"
-          image="assets/images/canvas.png"
+          image="assets/images/buttons/menu/canvas.png"
         ></game-button>
         <game-button
           title="Settings"
           route="pages/settings.html"
-          image="assets/images/gear.png"
+          image="assets/images/buttons/menu/gear.png"
         ></game-button>
         <game-button
           title="Characters"
@@ -58,7 +58,7 @@
         <play-button
           title="Play"
           route="game.html"
-          image="assets/images/play.png"
+          image="assets/images/buttons/play.png"
         ></play-button>
       </div>
 
@@ -86,7 +86,7 @@
 
         const img = new Image();
         img.onload = function () {
-          backgroundElement.style.backgroundImage = `url(assets/images/${selectedBackground}.jpg)`;
+          backgroundElement.style.backgroundImage = `url(assets/images/backgrounds/${selectedBackground}.jpg)`;
           backgroundElement.style.backgroundColor = "transparent";
         };
         img.onerror = function () {
@@ -97,7 +97,7 @@
           backgroundElement.style.backgroundColor = "rgb(31, 41, 55)"; // bg-gray-800
         };
 
-        img.src = `assets/images/${selectedBackground}.jpg`;
+        img.src = `assets/images/backgrounds/${selectedBackground}.jpg`;
 
         const textElements = document.querySelectorAll("h1, p");
         textElements.forEach((element) => {

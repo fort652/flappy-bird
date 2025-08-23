@@ -8,7 +8,6 @@ export class GameButton extends HTMLElement {
     const isInPagesFolder = window.location.pathname.includes("/pages/");
     const assetsPath = isInPagesFolder ? "../" : "";
 
-    // Special handling for character button
     if (id === "characterButton") {
       this.renderCharacterButton(assetsPath, title, route);
     } else {
@@ -40,12 +39,11 @@ export class GameButton extends HTMLElement {
         title="${title}"
       >
         <div id="characterImage" class="w-full h-full flex items-center justify-center">
-          <img src="${assetsPath}assets/images/tweety.png" alt="${title}" class="w-full h-full object-contain" id="selectedCharacterImage">
+          <img src="${assetsPath}assets/images/characters/tweety.png" alt="${title}" class="w-full h-full object-contain" id="selectedCharacterImage">
         </div>
       </button>
     `;
     
-    // Load and display the selected character
     this.loadSelectedCharacter(assetsPath);
   }
 
@@ -53,19 +51,17 @@ export class GameButton extends HTMLElement {
     const characterImage = this.querySelector("#selectedCharacterImage");
     if (!characterImage) return;
 
-    // Get the selected character from localStorage
     const selectedCharacter = localStorage.getItem("flappyBirdCharacter") || "default";
     
-    // Map character IDs to image paths
     const characterImages = {
-      "default": "assets/images/tweety.png",
-      "blue": "assets/images/blue-bird.png",
-      "purple": "assets/images/purple-bird.png",
-      "golden": "assets/images/tweety.png", // Using tweety as placeholder for now
-      "rainbow": "assets/images/tweety.png", // Using tweety as placeholder for now
-      "ninja": "assets/images/tweety.png", // Using tweety as placeholder for now
-      "giant": "assets/images/tweety.png", // Using tweety as placeholder for now
-      "mini": "assets/images/tweety.png" // Using tweety as placeholder for now
+      "default": "assets/images/characters/tweety.png",
+      "blue": "assets/images/characters/blue-bird.png",
+      "purple": "assets/images/characters/purple-bird.png",
+      "golden": "assets/images/characters/tweety.png", // Using tweety as placeholder for now
+      "rainbow": "assets/images/characters/tweety.png", // Using tweety as placeholder for now
+      "ninja": "assets/images/characters/tweety.png", // Using tweety as placeholder for now
+      "giant": "assets/images/characters/tweety.png", // Using tweety as placeholder for now
+      "mini": "assets/images/characters/tweety.png" // Using tweety as placeholder for now
     };
 
     const imagePath = characterImages[selectedCharacter] || characterImages["default"];
