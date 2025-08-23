@@ -12,11 +12,8 @@ module.exports = defineConfig([
   {
     rules: {
       "prettier/prettier": "error",
-      // This rule is asking for trouble and should be disabled
       "react-hooks/exhaustive-deps": "off",
-      // Breaks forwardRef. Helpful perhaps, not worth the trouble
       "react/display-name": "off",
-      // Useless rule
       "react/no-unescaped-entities": "off",
     },
   },

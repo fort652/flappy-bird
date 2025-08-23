@@ -20,13 +20,18 @@
       }
 
       .background-card::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        background: linear-gradient(
+          45deg,
+          transparent,
+          rgba(255, 255, 255, 0.1),
+          transparent
+        );
         transform: translateX(-100%);
         transition: transform 0.6s ease;
       }
@@ -43,7 +48,8 @@
 
       .background-card.selected {
         border-color: #fbbf24;
-        box-shadow: 0 0 30px rgba(251, 191, 36, 0.6), 0 10px 30px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 0 30px rgba(251, 191, 36, 0.6),
+          0 10px 30px rgba(0, 0, 0, 0.3);
         background: linear-gradient(
           135deg,
           rgba(251, 191, 36, 0.1),
@@ -65,13 +71,17 @@
       }
 
       .background-preview::after {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+        background: linear-gradient(
+          180deg,
+          transparent 0%,
+          rgba(0, 0, 0, 0.3) 100%
+        );
         pointer-events: none;
       }
 
@@ -100,14 +110,22 @@
       }
 
       .category-btn:not(.active) {
-        background: linear-gradient(135deg, rgba(75, 85, 99, 0.8), rgba(55, 65, 81, 0.9));
+        background: linear-gradient(
+          135deg,
+          rgba(75, 85, 99, 0.8),
+          rgba(55, 65, 81, 0.9)
+        );
         color: #e5e7eb;
         border-color: rgba(255, 255, 255, 0.1);
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
       }
 
       .category-btn:not(.active):hover {
-        background: linear-gradient(135deg, rgba(75, 85, 99, 0.9), rgba(55, 65, 81, 1));
+        background: linear-gradient(
+          135deg,
+          rgba(75, 85, 99, 0.9),
+          rgba(55, 65, 81, 1)
+        );
         color: #ffffff;
         border-color: rgba(255, 255, 255, 0.2);
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
@@ -119,7 +137,8 @@
       }
 
       @keyframes pulse {
-        0%, 100% {
+        0%,
+        100% {
           opacity: 1;
           transform: scale(1);
         }
@@ -182,69 +201,41 @@
 
     <!-- Header -->
     <div class="text-center pt-4 md:pt-8 pb-4 md:pb-6 px-4 relative z-10">
-      <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-yellow-400 mb-2 drop-shadow-lg">Backgrounds</h1>
-      <p class="text-base md:text-lg text-gray-300 drop-shadow-md">Customize your experience!</p>
+      <h1
+        class="text-2xl sm:text-3xl md:text-4xl font-bold text-yellow-400 mb-2 drop-shadow-lg"
+      >
+        Backgrounds
+      </h1>
     </div>
 
     <!-- Current Background Preview -->
     <div class="mx-4 mb-6 relative z-10">
-      <div class="current-bg-card rounded-2xl p-3 md:p-4 text-center backdrop-blur-sm">
-        <h3 class="text-base md:text-lg font-semibold mb-3 text-purple-200">Current Background</h3>
+      <div class="md:p-4 text-center backdrop-blur-sm">
         <div
           class="background-preview w-full h-24 md:h-40 rounded-xl mb-3"
           id="currentBackground"
         >
           <!-- Current background will be displayed here -->
         </div>
-        <p class="text-xs md:text-sm text-purple-200 font-medium" id="currentBackgroundName">Default</p>
-      </div>
-    </div>
-
-    <!-- Background Categories -->
-    <div class="mx-4 mb-6">
-      <div class="flex gap-2 overflow-x-auto pb-2">
-        <button
-          class="category-btn px-3 py-2 md:px-4 md:py-2 bg-yellow-500 text-black rounded-full whitespace-nowrap font-medium text-sm md:text-base"
-          data-category="all"
+        <p
+          class="text-xs md:text-sm text-purple-200 font-medium"
+          id="currentBackgroundName"
         >
-          All
-        </button>
-        <button
-          class="category-btn px-3 py-2 md:px-4 md:py-2 bg-gray-600 text-white rounded-full whitespace-nowrap font-sm md:text-base"
-          data-category="nature"
-        >
-          Nature
-        </button>
-        <button
-          class="category-btn px-3 py-2 md:px-4 md:py-2 bg-gray-600 text-white rounded-full whitespace-nowrap font-sm md:text-base"
-          data-category="urban"
-        >
-          Urban
-        </button>
-        <button
-          class="category-btn px-3 py-2 md:px-4 md:py-2 bg-gray-600 text-white rounded-full whitespace-nowrap font-sm md:text-base"
-          data-category="space"
-        >
-          Space
-        </button>
-        <button
-          class="category-btn px-3 py-2 md:px-4 md:py-2 bg-gray-600 text-white rounded-full whitespace-nowrap font-sm md:text-base"
-          data-category="seasons"
-        >
-          Seasons
-        </button>
+          Default
+        </p>
       </div>
     </div>
 
     <!-- Backgrounds Grid -->
-    <div class="mx-4 mb-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 relative z-10" id="backgroundsGrid">
+    <div
+      class="mx-4 mb-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 relative z-10"
+      id="backgroundsGrid"
+    >
       <!-- Backgrounds will be populated by JavaScript -->
     </div>
 
     <!-- Navigation -->
-    <div
-      class="fixed top-4 left-4 z-50"
-    >
+    <div class="fixed top-4 left-4 z-50">
       <button
         onclick="window.location.href='../index.html'"
         class="bg-blue-600 text-white w-12 h-12 rounded-full font-medium hover:bg-blue-700 transition-colors flex items-center justify-center text-xl"
@@ -253,114 +244,8 @@
       </button>
     </div>
 
-    <script>
-      // Background data
-      const backgrounds = [
-        {
-          id: "default",
-          name: "Default Sky",
-          category: "nature",
-          image: "../assets/images/backgrounds/default.jpg",
-          unlocked: true,
-          requirement: "Default background",
-        },
-        {
-          id: "spring",
-          name: "Spring Blossoms",
-          category: "seasons",
-          image: "../assets/images/backgrounds/spring.jpg",
-          unlocked: false,
-          requirement: "Score 25 points",
-        },
-        {
-          id: "summer",
-          name: "Summer Fields",
-          category: "seasons",
-          image: "../assets/images/backgrounds/summer.jpg",
-          unlocked: false,
-          requirement: "Score 50 points",
-        },
-        {
-          id: "autumn",
-          name: "Autumn Colors",
-          category: "seasons",
-          image: "../assets/images/backgrounds/autumn.jpg",
-          unlocked: false,
-          requirement: "Score 75 points",
-        },
-        {
-          id: "winter",
-          name: "Winter Wonderland",
-          category: "seasons",
-          image: "../assets/images/backgrounds/winter.jpg",
-          unlocked: false,
-          requirement: "Score 100 points",
-        },
-        {
-          id: "forest",
-          name: "Mystical Forest",
-          category: "nature",
-          image: "../assets/images/backgrounds/forest.jpg",
-          unlocked: false,
-          requirement: "Play 25 games",
-        },
-        {
-          id: "ocean",
-          name: "Ocean Waves",
-          category: "nature",
-          image: "../assets/images/backgrounds/ocean.jpg",
-          unlocked: false,
-          requirement: "Play 50 games",
-        },
-        {
-          id: "mountain",
-          name: "Mountain Peak",
-          category: "nature",
-          image: "../assets/images/backgrounds/mountain.jpg",
-          unlocked: false,
-          requirement: "Play 75 games",
-        },
-        {
-          id: "desert",
-          name: "Desert Sunset",
-          category: "nature",
-          image: "../assets/images/backgrounds/desert.jpg",
-          unlocked: false,
-          requirement: "Play 100 games",
-        },
-        {
-          id: "city",
-          name: "City Lights",
-          category: "urban",
-          image: "../assets/images/backgrounds/city.jpg",
-          unlocked: false,
-          requirement: "Achieve 5 perfect runs",
-        },
-        {
-          id: "night",
-          name: "Night Sky",
-          category: "space",
-          image: "../assets/images/backgrounds/night.jpg",
-          unlocked: false,
-          requirement: "Play for 7 consecutive days",
-        },
-        {
-          id: "galaxy",
-          name: "Galaxy View",
-          category: "space",
-          image: "../assets/images/backgrounds/galaxy.jpg",
-          unlocked: false,
-          requirement: "Score 150 points",
-        },
-        {
-          id: "space",
-          name: "Deep Space",
-          category: "space",
-          image: "../assets/images/backgrounds/space.jpg",
-          unlocked: false,
-          requirement: "Score 200 points",
-        },
-      ];
+    <script type="module">
+      import backgrounds from "../data/backgrounds.js";
 
       let currentCategory = "all";
       let currentBackground = "default";
@@ -406,13 +291,15 @@
         if (background) {
           // Test if the image loads successfully
           const img = new Image();
-          img.onload = function() {
+          img.onload = function () {
             preview.style.backgroundImage = `url(${background.image})`;
             name.textContent = background.name;
           };
-          img.onerror = function() {
+          img.onerror = function () {
             // Fallback to default if image fails to load
-            console.log(`Background image not found: ${background.image}, using fallback`);
+            console.log(
+              `Background image not found: ${background.image}, using fallback`
+            );
             preview.style.backgroundImage = "none";
             preview.style.backgroundColor = "rgba(139, 92, 246, 0.3)";
             name.textContent = background.name + " (Image not available)";
@@ -459,25 +346,27 @@
           <div class="background-card rounded-2xl p-3 ${
             isSelected ? "selected" : ""
           } ${!isUnlocked ? "locked" : ""}" 
-               onclick="selectBackground('${background.id}')">
+               data-background-id="${background.id}">
             <div class="background-preview w-full h-32 rounded-lg mb-3" 
                  style="background-image: url(${background.image})"></div>
             <div class="text-center">
               <h3 class="font-semibold text-sm mb-1 ${
                 isUnlocked ? "text-white" : "text-gray-400"
               }">${background.name}</h3>
-              ${
-                isUnlocked
-                  ? `<div class="text-xs text-gray-300">${
-                      isSelected ? "Selected" : "Click to select"
-                    }</div>`
-                  : `<div class="unlock-badge text-xs text-black font-bold px-2 py-1 rounded-full">${background.requirement}</div>`
-              }
             </div>
           </div>
         `;
           })
           .join("");
+
+        // Add click event listeners to background cards
+        const backgroundCards = grid.querySelectorAll("[data-background-id]");
+        backgroundCards.forEach((card) => {
+          card.addEventListener("click", function () {
+            const backgroundId = this.getAttribute("data-background-id");
+            selectBackground(backgroundId);
+          });
+        });
       }
 
       // Select background
@@ -561,7 +450,7 @@
           particle.className = "particle";
           particle.style.left = Math.random() * 100 + "%";
           particle.style.animationDelay = Math.random() * 6 + "s";
-          particle.style.animationDuration = (Math.random() * 3 + 4) + "s";
+          particle.style.animationDuration = Math.random() * 3 + 4 + "s";
           particlesContainer.appendChild(particle);
         }
       }

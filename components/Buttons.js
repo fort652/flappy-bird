@@ -39,11 +39,11 @@ export class GameButton extends HTMLElement {
         title="${title}"
       >
         <div id="characterImage" class="w-full h-full flex items-center justify-center">
-          <img src="${assetsPath}assets/images/characters/tweety.png" alt="${title}" class="w-full h-full object-contain" id="selectedCharacterImage">
+          <img src="${assetsPath}assets/images/characters/default.png" alt="${title}" class="w-full h-full object-contain" id="selectedCharacterImage">
         </div>
       </button>
     `;
-    
+
     this.loadSelectedCharacter(assetsPath);
   }
 
@@ -51,20 +51,18 @@ export class GameButton extends HTMLElement {
     const characterImage = this.querySelector("#selectedCharacterImage");
     if (!characterImage) return;
 
-    const selectedCharacter = localStorage.getItem("flappyBirdCharacter") || "default";
-    
+    const selectedCharacter =
+      localStorage.getItem("flappyBirdCharacter") || "default";
+
     const characterImages = {
-      "default": "assets/images/characters/tweety.png",
-      "blue": "assets/images/characters/blue-bird.png",
-      "purple": "assets/images/characters/purple-bird.png",
-      "golden": "assets/images/characters/tweety.png", // Using tweety as placeholder for now
-      "rainbow": "assets/images/characters/tweety.png", // Using tweety as placeholder for now
-      "ninja": "assets/images/characters/tweety.png", // Using tweety as placeholder for now
-      "giant": "assets/images/characters/tweety.png", // Using tweety as placeholder for now
-      "mini": "assets/images/characters/tweety.png" // Using tweety as placeholder for now
+      default: "assets/images/characters/default.png",
+      blue: "assets/images/characters/blue-bird.png",
+      purple: "assets/images/characters/purple-bird.png",
+      golden: "assets/images/characters/tweety.png",
     };
 
-    const imagePath = characterImages[selectedCharacter] || characterImages["default"];
+    const imagePath =
+      characterImages[selectedCharacter] || characterImages["default"];
     characterImage.src = `${assetsPath}${imagePath}`;
   }
 }

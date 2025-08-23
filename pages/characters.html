@@ -99,14 +99,16 @@
   >
     <!-- Header -->
     <div class="text-center pt-4 md:pt-8 pb-4 md:pb-6 px-4">
-      <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-yellow-400 mb-2">Characters</h1>
-      <p class="text-base md:text-lg text-gray-300">Choose your bird!</p>
+      <h1
+        class="text-2xl sm:text-3xl md:text-4xl font-bold text-yellow-400 mb-2"
+      >
+        Characters
+      </h1>
     </div>
 
     <!-- Current Character Preview -->
     <div class="mx-4 mb-6">
       <div class="setting-card rounded-2xl p-3 md:p-4 text-center">
-        <h3 class="text-base md:text-lg font-semibold mb-3">Current Character</h3>
         <div
           class="character-image w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-3"
           id="currentCharacterImage"
@@ -119,42 +121,6 @@
       </div>
     </div>
 
-    <!-- Character Categories -->
-    <div class="mx-4 mb-6">
-      <div class="flex gap-2 overflow-x-auto pb-2">
-        <button
-          class="category-btn px-3 py-2 md:px-4 md:py-2 bg-yellow-500 text-black rounded-full whitespace-nowrap font-medium text-sm md:text-base"
-          data-category="all"
-        >
-          All
-        </button>
-        <button
-          class="category-btn px-3 py-2 md:px-4 md:py-2 bg-gray-600 text-white rounded-full whitespace-nowrap text-sm md:text-base"
-          data-category="starter"
-        >
-          Starter
-        </button>
-        <button
-          class="category-btn px-3 py-2 md:px-4 md:py-2 bg-gray-600 text-white rounded-full whitespace-nowrap text-sm md:text-base"
-          data-category="advanced"
-        >
-          Advanced
-        </button>
-        <button
-          class="category-btn px-3 py-2 md:px-4 md:py-2 bg-gray-600 text-white rounded-full whitespace-nowrap text-sm md:text-base"
-          data-category="legendary"
-        >
-          Legendary
-        </button>
-        <button
-          class="category-btn px-3 py-2 md:px-4 md:py-2 bg-gray-600 text-white rounded-full whitespace-nowrap text-sm md:text-base"
-          data-category="special"
-        >
-          Special
-        </button>
-      </div>
-    </div>
-
     <!-- Characters Grid -->
     <div class="mx-4 mb-20 grid grid-cols-1 gap-3 md:gap-4" id="charactersGrid">
       <!-- Characters will be populated by JavaScript -->
@@ -164,17 +130,17 @@
     <div
       id="characterInfoPopup"
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] hidden"
-      onclick="hideCharacterInfo()"
     >
       <div
         class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 max-w-lg mx-4 max-h-[90vh] overflow-y-auto"
-        onclick="event.stopPropagation()"
       >
         <!-- Header -->
         <div class="flex justify-between items-center mb-6">
-          <h2 class="text-2xl font-bold text-yellow-400" id="popupTitle">Character Info</h2>
+          <h2 class="text-2xl font-bold text-yellow-400" id="popupTitle">
+            Character Info
+          </h2>
           <button
-            onclick="hideCharacterInfo()"
+            id="closePopupBtn"
             class="text-gray-400 hover:text-white text-2xl font-bold transition-colors"
           >
             ×
@@ -187,12 +153,16 @@
             id="popupCharacterImage"
             class="character-image w-24 h-24 rounded-lg mx-auto mb-3"
           ></div>
-          <h3 class="text-xl font-semibold text-white" id="popupCharacterName">Character Name</h3>
+          <h3 class="text-xl font-semibold text-white" id="popupCharacterName">
+            Character Name
+          </h3>
         </div>
 
         <!-- Character Description -->
         <div class="mb-6">
-          <p class="text-gray-300 text-center" id="popupDescription">Character description</p>
+          <p class="text-gray-300 text-center" id="popupDescription">
+            Character description
+          </p>
         </div>
 
         <!-- Stats Section -->
@@ -206,20 +176,23 @@
         </div>
 
         <!-- How to Use Section -->
-        <div class="p-4 bg-blue-900 bg-opacity-30 rounded-lg border border-blue-500 border-opacity-30">
-          <h3 class="text-lg font-semibold text-blue-300 mb-2">🎮 How to Use Special Ability</h3>
+        <div
+          class="p-4 bg-blue-900 bg-opacity-30 rounded-lg border border-blue-500 border-opacity-30"
+        >
+          <h3 class="text-lg font-semibold text-blue-300 mb-2">
+            🎮 How to Use Special Ability
+          </h3>
           <p class="text-gray-300 text-sm">
-            <strong>In the game:</strong> Tap the lightning bolt button (⚡) to activate your bird's special ability! 
-            Each ability has a cooldown period, so use them strategically.
+            <strong>In the game:</strong> Tap the lightning bolt button (⚡) to
+            activate your bird's special ability! Each ability has a cooldown
+            period, so use them strategically.
           </p>
         </div>
       </div>
     </div>
 
     <!-- Navigation -->
-    <div
-      class="fixed top-4 left-4 z-50"
-    >
+    <div class="fixed top-4 left-4 z-50">
       <button
         onclick="window.location.href='../index.html'"
         class="bg-blue-600 text-white w-12 h-12 rounded-full font-medium hover:bg-blue-700 transition-colors flex items-center justify-center text-xl"
@@ -228,130 +201,8 @@
       </button>
     </div>
 
-    <script>
-      // Character data
-      const characters = [
-        {
-          id: "default",
-          name: "Default Bird",
-          category: "starter",
-          image: "../assets/images/characters/tweety.png",
-          unlocked: true,
-          requirement: "Default character",
-          stats: {
-            speed: 1.0,
-            agility: 1.0,
-            size: 1.0,
-            special: "None",
-          },
-          description: "A balanced bird with no special abilities.",
-        },
-        {
-          id: "blue",
-          name: "Blue Bird",
-          category: "starter",
-          image: "../assets/images/characters/blue-bird.png",
-          unlocked: false,
-          requirement: "Complete first game",
-          stats: {
-            speed: 1.1,
-            agility: 1.0,
-            size: 0.9,
-            special: "Speed Boost",
-          },
-          description: "Slightly faster than the default bird.",
-        },
-        {
-          id: "purple",
-          name: "Purple Bird",
-          category: "advanced",
-          image: "../assets/images/characters/purple-bird.png",
-          unlocked: false,
-          requirement: "Score 25 points",
-          stats: {
-            speed: 1.0,
-            agility: 1.2,
-            size: 0.8,
-            special: "Agility Boost",
-          },
-          description: "More agile and smaller hitbox.",
-        },
-        {
-          id: "golden",
-          name: "Golden Bird",
-          category: "legendary",
-          image: "../assets/images/characters/tweety.png", // Using tweety as placeholder
-          unlocked: false,
-          requirement: "Score 100 points",
-          stats: {
-            speed: 1.2,
-            agility: 1.1,
-            size: 0.9,
-            special: "Double Points",
-          },
-          description: "Rare bird that earns double points!",
-        },
-        {
-          id: "rainbow",
-          name: "Rainbow Bird",
-          category: "special",
-          image: "../assets/images/characters/tweety.png", // Using tweety as placeholder
-          unlocked: false,
-          requirement: "Play for 7 consecutive days",
-          stats: {
-            speed: 1.0,
-            agility: 1.0,
-            size: 1.0,
-            special: "Rainbow Trail",
-          },
-          description: "Leaves a beautiful rainbow trail behind.",
-        },
-        {
-          id: "ninja",
-          name: "Ninja Bird",
-          category: "advanced",
-          image: "../assets/images/characters/tweety.png", // Using tweety as placeholder
-          unlocked: false,
-          requirement: "Achieve 5 perfect runs",
-          stats: {
-            speed: 1.1,
-            agility: 1.3,
-            size: 0.7,
-            special: "Stealth Mode",
-          },
-          description: "Silent and stealthy with enhanced agility.",
-        },
-        {
-          id: "giant",
-          name: "Giant Bird",
-          category: "special",
-          image: "../assets/images/characters/tweety.png", // Using tweety as placeholder
-          unlocked: false,
-          requirement: "Score 150 points",
-          stats: {
-            speed: 0.8,
-            agility: 0.9,
-            size: 1.5,
-            special: "Crash Through",
-          },
-          description: "Large bird that can break through obstacles.",
-        },
-        {
-          id: "mini",
-          name: "Mini Bird",
-          category: "advanced",
-          image: "../assets/images/characters/tweety.png", // Using tweety as placeholder
-          unlocked: false,
-          requirement: "Score 75 points",
-          stats: {
-            speed: 1.0,
-            agility: 1.4,
-            size: 0.6,
-            special: "Tiny Target",
-          },
-          description: "Extremely small with maximum agility.",
-        },
-      ];
+    <script type="module">
+      import characters from "../data/characters.js";
 
       let currentCategory = "all";
       let currentCharacter = "default";
@@ -397,7 +248,7 @@
           // Save the default character to localStorage
           localStorage.setItem("flappyBirdCharacter", "default");
         }
-        
+
         // Update the display immediately
         updateCurrentCharacter();
       }
@@ -437,8 +288,8 @@
             return `
           <div class="character-card rounded-2xl p-4 ${
             isSelected ? "selected" : ""
-          } ${!isUnlocked ? "locked" : ""}" 
-               onclick="selectCharacter('${character.id}')">
+          } ${!isUnlocked ? "locked" : ""}"
+               data-character-id="${character.id}">
             <div class="flex items-start gap-4">
               <div class="character-image w-20 h-20 rounded-lg" 
                    style="background-image: url(${character.image})"></div>
@@ -449,14 +300,16 @@
                   }">${character.name}</h3>
                   <div class="flex items-center gap-2">
                     ${
-                      isUnlocked
-                        ? `<div class="text-xs text-gray-300">${
-                            isSelected ? "Selected" : "Click to select"
-                          }</div>`
-                        : `<div class="unlock-badge text-xs text-black font-bold px-2 py-1 rounded-full">${character.requirement}</div>`
+                      !isUnlocked
+                        ? `<div class="unlock-badge text-xs text-black font-bold px-2 py-1 rounded-full">${character.requirement}</div>`
+                        : ""
                     }
-                    <button 
-                      onclick="showCharacterInfo('${character.id}')" 
+                    ${
+                      !isUnlocked
+                        ? ""
+                        : `
+                      <button 
+                      data-character-id="${character.id}"
                       class="info-button bg-blue-600 hover:bg-blue-700 text-white w-6 h-6 rounded-full flex items-center justify-center transition-colors"
                       title="View abilities"
                     >
@@ -464,6 +317,8 @@
                         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
                       </svg>
                     </button>
+                    `
+                    }
                   </div>
                 </div>
                 <p class="text-sm text-gray-300 mb-3">${
@@ -474,33 +329,7 @@
                   isUnlocked
                     ? `
                   <div class="space-y-2">
-                    <div class="flex justify-between items-center">
-                      <span class="text-xs text-gray-400">Speed:</span>
-                      <div class="w-20 bg-gray-700 rounded-full h-2">
-                        <div class="stat-bar h-2 rounded-full" style="width: ${
-                          character.stats.speed * 100
-                        }%"></div>
-                      </div>
-                    </div>
-                    <div class="flex justify-between items-center">
-                      <span class="text-xs text-gray-400">Agility:</span>
-                      <div class="w-20 bg-gray-700 rounded-full h-2">
-                        <div class="stat-bar h-2 rounded-full" style="width: ${
-                          character.stats.agility * 100
-                        }%"></div>
-                      </div>
-                    </div>
-                    <div class="flex justify-between items-center">
-                      <span class="text-xs text-gray-400">Size:</span>
-                      <div class="w-20 bg-gray-700 rounded-full h-2">
-                        <div class="stat-bar h-2 rounded-full" style="width: ${
-                          character.stats.size * 100
-                        }%"></div>
-                      </div>
-                    </div>
-                    <div class="text-xs text-yellow-400 font-medium">Special: ${
-                      character.stats.special
-                    }</div>
+                    <div class="text-xs text-yellow-400 font-medium">Specialty: ${character.stats.special}</div>
                   </div>
                 `
                     : ""
@@ -511,6 +340,25 @@
         `;
           })
           .join("");
+
+        // Add click event listeners to character cards and info buttons
+        const characterCards = grid.querySelectorAll("[data-character-id]");
+        characterCards.forEach((card) => {
+          card.addEventListener("click", function () {
+            const characterId = this.getAttribute("data-character-id");
+            selectCharacter(characterId);
+          });
+        });
+
+        // Add click event listeners to info buttons (prevent event bubbling)
+        const infoButtons = grid.querySelectorAll(".info-button");
+        infoButtons.forEach((button) => {
+          button.addEventListener("click", function (e) {
+            e.stopPropagation(); // Prevent triggering the card click
+            const characterId = this.getAttribute("data-character-id");
+            showCharacterInfo(characterId);
+          });
+        });
       }
 
       // Select character
@@ -554,16 +402,22 @@
       // Initialize on load
       window.addEventListener("load", initCharacters);
 
+      // Setup popup event listeners when DOM is ready
+      document.addEventListener("DOMContentLoaded", setupPopupEventListeners);
+
       // Character info popup functions
       function showCharacterInfo(characterId) {
-        const character = characters.find(char => char.id === characterId);
+        const character = characters.find((char) => char.id === characterId);
         if (!character) return;
 
         // Update popup content
-        document.getElementById("popupTitle").textContent = "Character Abilities";
-        document.getElementById("popupCharacterName").textContent = character.name;
-        document.getElementById("popupDescription").textContent = character.description;
-        
+        document.getElementById("popupTitle").textContent =
+          "Character Abilities";
+        document.getElementById("popupCharacterName").textContent =
+          character.name;
+        document.getElementById("popupDescription").textContent =
+          character.description;
+
         // Update character image
         const popupImage = document.getElementById("popupCharacterImage");
         popupImage.style.backgroundImage = `url(${character.image})`;
@@ -571,40 +425,13 @@
         // Update stats section
         const popupStats = document.getElementById("popupStats");
         popupStats.innerHTML = `
-          <h4 class="text-lg font-semibold text-white mb-3">📊 Character Stats</h4>
-          <div class="space-y-3">
-            <div class="flex justify-between items-center">
-              <span class="text-sm text-gray-300">Speed:</span>
-              <div class="flex items-center gap-2">
-                <div class="w-24 bg-gray-700 rounded-full h-2">
-                  <div class="stat-bar h-2 rounded-full" style="width: ${character.stats.speed * 100}%"></div>
-                </div>
-                <span class="text-xs text-gray-400">${character.stats.speed}x</span>
-              </div>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-sm text-gray-300">Agility:</span>
-              <div class="flex items-center gap-2">
-                <div class="w-24 bg-gray-700 rounded-full h-2">
-                  <div class="stat-bar h-2 rounded-full" style="width: ${character.stats.agility * 100}%"></div>
-                </div>
-                <span class="text-xs text-gray-400">${character.stats.agility}x</span>
-              </div>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-sm text-gray-300">Size:</span>
-              <div class="flex items-center gap-2">
-                <div class="w-24 bg-gray-700 rounded-full h-2">
-                  <div class="stat-bar h-2 rounded-full" style="width: ${character.stats.size * 100}%"></div>
-                </div>
-                <span class="text-xs text-gray-400">${character.stats.size}x</span>
-              </div>
-            </div>
-          </div>
+          
         `;
 
         // Update special ability section
-        const popupSpecialAbility = document.getElementById("popupSpecialAbility");
+        const popupSpecialAbility = document.getElementById(
+          "popupSpecialAbility"
+        );
         if (character.id === "default") {
           popupSpecialAbility.innerHTML = `
             <div class="p-4 bg-gray-800 rounded-lg border border-gray-600">
@@ -629,7 +456,9 @@
         }
 
         // Show popup
-        document.getElementById("characterInfoPopup").classList.remove("hidden");
+        document
+          .getElementById("characterInfoPopup")
+          .classList.remove("hidden");
         document.getElementById("characterInfoPopup").style.display = "flex";
       }
 
@@ -638,53 +467,74 @@
         document.getElementById("characterInfoPopup").style.display = "none";
       }
 
+      // Add popup event listeners
+      function setupPopupEventListeners() {
+        const popup = document.getElementById("characterInfoPopup");
+        const closeBtn = document.getElementById("closePopupBtn");
+
+        // Close popup when clicking outside
+        popup.addEventListener("click", function (e) {
+          if (e.target === popup) {
+            hideCharacterInfo();
+          }
+        });
+
+        // Close popup when clicking close button
+        closeBtn.addEventListener("click", hideCharacterInfo);
+      }
+
       function getAbilityInfo(characterId) {
         const abilities = {
-          "blue": {
+          blue: {
             title: "Speed Boost",
-            description: "Temporarily increases speed and reduces gravity for better control.",
+            description:
+              "Temporarily increases speed and reduces gravity for better control.",
             effect: "10% faster, reduced gravity",
             duration: "3 seconds",
             cooldown: "10 seconds",
             bestFor: "Speed runs, escaping tight spots",
             bgColor: "bg-blue-900 bg-opacity-30",
             borderColor: "border-blue-500 border-opacity-30",
-            textColor: "text-blue-300"
+            textColor: "text-blue-300",
           },
-          "purple": {
+          purple: {
             title: "Agility Boost",
-            description: "Enhanced maneuverability and control for precise flying.",
+            description:
+              "Enhanced maneuverability and control for precise flying.",
             effect: "Better control, reduced gravity",
             duration: "2 seconds",
             cooldown: "8 seconds",
             bestFor: "Precision flying, tight maneuvers",
             bgColor: "bg-purple-900 bg-opacity-30",
             borderColor: "border-purple-500 border-opacity-30",
-            textColor: "text-purple-300"
+            textColor: "text-purple-300",
           },
-          "golden": {
+          golden: {
             title: "Double Points",
-            description: "Earns double points and can activate enhanced point multiplier.",
+            description:
+              "Earns double points and can activate enhanced point multiplier.",
             effect: "2x points normally, 4x points when active",
             duration: "5 seconds",
             cooldown: "15 seconds",
             bestFor: "High score attempts",
             bgColor: "bg-yellow-900 bg-opacity-30",
             borderColor: "border-yellow-500 border-opacity-30",
-            textColor: "text-yellow-300"
+            textColor: "text-yellow-300",
           },
-          "rainbow": {
+          rainbow: {
             title: "Rainbow Trail",
-            description: "Creates a beautiful rainbow trail effect around the bird.",
+            description:
+              "Creates a beautiful rainbow trail effect around the bird.",
             effect: "Rainbow aura and particles",
             duration: "4 seconds",
             cooldown: "12 seconds",
             bestFor: "Visual appeal, style points",
-            bgColor: "bg-gradient-to-r from-pink-900 to-purple-900 bg-opacity-30",
+            bgColor:
+              "bg-gradient-to-r from-pink-900 to-purple-900 bg-opacity-30",
             borderColor: "border-pink-500 border-opacity-30",
-            textColor: "text-pink-300"
+            textColor: "text-pink-300",
           },
-          "ninja": {
+          ninja: {
             title: "Stealth Mode",
             description: "Enhanced stealth with maximum agility and tiny size.",
             effect: "Stealth aura and enhanced agility",
@@ -693,32 +543,34 @@
             bestFor: "Expert precision challenges",
             bgColor: "bg-gray-900 bg-opacity-30",
             borderColor: "border-gray-500 border-opacity-30",
-            textColor: "text-gray-300"
+            textColor: "text-gray-300",
           },
-          "giant": {
+          giant: {
             title: "Crash Through",
-            description: "Becomes massive and can potentially break through obstacles.",
+            description:
+              "Becomes massive and can potentially break through obstacles.",
             effect: "Becomes extremely large",
             duration: "2 seconds",
             cooldown: "10 seconds",
             bestFor: "Tank-style gameplay",
             bgColor: "bg-red-900 bg-opacity-30",
             borderColor: "border-red-500 border-opacity-30",
-            textColor: "text-red-300"
+            textColor: "text-red-300",
           },
-          "mini": {
+          mini: {
             title: "Mini Mode",
-            description: "Becomes extremely small for maximum agility and precision.",
+            description:
+              "Becomes extremely small for maximum agility and precision.",
             effect: "Becomes extremely small",
             duration: "4 seconds",
             cooldown: "12 seconds",
             bestFor: "Speed runs, high scores",
             bgColor: "bg-green-900 bg-opacity-30",
             borderColor: "border-green-500 border-opacity-30",
-            textColor: "text-green-300"
-          }
+            textColor: "text-green-300",
+          },
         };
-        
+
         return abilities[characterId] || abilities["default"];
       }
     </script>
