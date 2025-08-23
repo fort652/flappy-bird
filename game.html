@@ -321,6 +321,13 @@
           <div id="abilityCooldown" class="text-xs text-gray-300"></div>
         </div>
       </div>
+      
+      <!-- Debug Info (only visible in development) -->
+      <div class="absolute bottom-5 left-5 text-white text-xs bg-black bg-opacity-50 rounded-lg p-2 hidden" id="debugInfo">
+        <div>Character: <span id="debugCharacter">-</span></div>
+        <div>Images: <span id="debugImages">-</span></div>
+        <div>Game State: <span id="debugGameState">-</span></div>
+      </div>
 
       <div
         class="countdown-overlay"
@@ -366,7 +373,7 @@
             class="game-over-button"
           >
             <div class="button-content">
-              <img src="assets/images/reload.png" alt="Restart" class="button-icon">
+              <img src="assets/images/buttons/reload.png" alt="Restart" class="button-icon">
               Play Again
             </div>
           </button>
@@ -376,7 +383,7 @@
             class="game-over-button"
           >
             <div class="button-content">
-              <img src="assets/images/back.png" alt="Home" class="button-icon">
+              <img src="assets/images/buttons/back.png" alt="Home" class="button-icon">
               Go Home
             </div>
           </button>
@@ -453,7 +460,10 @@
         canvas.addEventListener("touchstart", handleTouch);
         window.addEventListener("resize", handleResize);
 
-        startGame();
+        // Wait a bit for character images to load before starting the game
+        setTimeout(() => {
+          startGame();
+        }, 500);
       }
 
       function loadGameSettings() {
@@ -490,6 +500,11 @@
         localStorage.setItem("flappyBirdProgress", JSON.stringify(progress));
         
         console.log(`Final bird character set to: ${bird.character}`);
+        
+        // Force a refresh of the character display after loading
+        setTimeout(() => {
+          updateCharacterDisplay();
+        }, 100);
       }
 
       function ensureDefaultUnlocks() {
@@ -589,6 +604,40 @@
       // Make test functions available globally for debugging
       window.testSpecialAbility = testSpecialAbility;
       window.debugProgress = debugProgress;
+      window.debugCharacter = () => {
+        console.log("=== CHARACTER DEBUG ===");
+        console.log("Bird character:", bird.character);
+        console.log("Character images loaded:", Object.keys(characterImages));
+        console.log("Selected character from localStorage:", localStorage.getItem("flappyBirdCharacter"));
+        console.log("Character image object:", characterImages[bird.character]);
+        console.log("=== END CHARACTER DEBUG ===");
+      };
+      
+      window.reloadCharacter = () => {
+        console.log("Reloading character...");
+        const savedCharacter = localStorage.getItem("flappyBirdCharacter");
+        if (savedCharacter) {
+          bird.character = savedCharacter;
+          console.log(`Character reloaded to: ${bird.character}`);
+          updateCharacterDisplay();
+        } else {
+          console.log("No character saved in localStorage");
+        }
+      };
+      
+      window.forceCharacterReload = () => {
+        console.log("Force reloading character images...");
+        characterImages = {}; // Clear cache
+        preloadCharacterImages(); // Reload all images
+      };
+      
+      window.switchCharacter = (characterId) => {
+        console.log(`Switching character to: ${characterId}`);
+        bird.character = characterId;
+        localStorage.setItem("flappyBirdCharacter", characterId);
+        updateCharacterDisplay();
+        updateAbilityUI();
+      };
 
       function initAudio() {
         try {
@@ -600,25 +649,66 @@
       }
 
       function preloadCharacterImages() {
+        console.log("Starting to preload character images...");
+        
         const characters = [
-          { id: "default", path: "assets/images/tweety.png" },
-          { id: "blue", path: "assets/images/blue-bird.png" },
-          { id: "purple", path: "assets/images/purple-bird.png" },
-          { id: "golden", path: "assets/images/tweety.png" }, // Using tweety as placeholder
-          { id: "rainbow", path: "assets/images/tweety.png" }, // Using tweety as placeholder
-          { id: "ninja", path: "assets/images/tweety.png" }, // Using tweety as placeholder
-          { id: "giant", path: "assets/images/tweety.png" }, // Using tweety as placeholder
-          { id: "mini", path: "assets/images/tweety.png" } // Using tweety as placeholder
+          { id: "default", path: "assets/images/characters/tweety.png" },
+          { id: "blue", path: "assets/images/characters/blue-bird.png" },
+          { id: "purple", path: "assets/images/characters/purple-bird.png" },
+          { id: "golden", path: "assets/images/characters/tweety.png" }, // Using tweety as placeholder
+          { id: "rainbow", path: "assets/images/characters/tweety.png" }, // Using tweety as placeholder
+          { id: "ninja", path: "assets/images/characters/tweety.png" }, // Using tweety as placeholder
+          { id: "giant", path: "assets/images/characters/tweety.png" }, // Using tweety as placeholder
+          { id: "mini", path: "assets/images/characters/tweety.png" } // Using tweety as placeholder
         ];
+
+        let loadedCount = 0;
+        const totalCount = characters.length;
 
         characters.forEach(char => {
           const img = new Image();
           img.onload = () => {
             characterImages[char.id] = img;
-            console.log(`Character image loaded: ${char.id}`);
+            loadedCount++;
+            console.log(`Character image loaded: ${char.id} (${loadedCount}/${totalCount})`);
+            
+            // Update character display when images are loaded
+            if (char.id === bird.character) {
+              updateCharacterDisplay();
+            }
+            
+            // Check if all images are loaded
+            if (loadedCount === totalCount) {
+              console.log("All character images loaded successfully!");
+              updateCharacterDisplay();
+            }
           };
           img.onerror = () => {
             console.log(`Failed to load character image: ${char.path}`);
+            // Try alternative path if the characters subfolder doesn't exist
+            const altImg = new Image();
+            altImg.onload = () => {
+              characterImages[char.id] = altImg;
+              loadedCount++;
+              console.log(`Character image loaded from alternative path: ${char.id} (${loadedCount}/${totalCount})`);
+              if (char.id === bird.character) {
+                updateCharacterDisplay();
+              }
+              if (loadedCount === totalCount) {
+                console.log("All character images loaded successfully!");
+                updateCharacterDisplay();
+              }
+            };
+            altImg.onerror = () => {
+              console.log(`Failed to load character image from alternative path: ${char.id}`);
+              loadedCount++;
+              if (loadedCount === totalCount) {
+                console.log("All character images processed (some failed)");
+                updateCharacterDisplay();
+              }
+            };
+            // Try without the characters subfolder
+            altImg.src = char.path.replace('characters/', '');
           };
           img.src = char.path;
         });
@@ -716,6 +806,13 @@
         // Stop any currently playing audio when starting a new game
         stopAllAudio();
 
+        // Reload character from localStorage to ensure it's current
+        const savedCharacter = localStorage.getItem("flappyBirdCharacter");
+        if (savedCharacter && savedCharacter !== bird.character) {
+          bird.character = savedCharacter;
+          console.log(`Character updated to: ${bird.character}`);
+        }
+
         gameRunning = false;
         countdownActive = true;
         countdownValue = 3;
@@ -738,6 +835,9 @@
         
         // Update ability UI to show ready state
         updateAbilityUI();
+        
+        // Update character display
+        updateCharacterDisplay();
 
         startCountdown();
       }
@@ -824,6 +924,15 @@
         if (e.code === "Space" && gameRunning) {
           e.preventDefault();
           flap();
+        }
+        
+        // Debug toggle with F12 key
+        if (e.code === "F12") {
+          e.preventDefault();
+          const debugInfo = document.getElementById("debugInfo");
+          if (debugInfo) {
+            debugInfo.classList.toggle("hidden");
+          }
         }
       }
 
@@ -1041,6 +1150,59 @@
         
         // Update UI
         updateAbilityUI();
+      }
+
+      function updateCharacterDisplay() {
+        console.log(`Updating character display for: ${bird.character}`);
+        console.log(`Available character images:`, Object.keys(characterImages));
+        
+        // Check if the character image is loaded
+        if (characterImages[bird.character]) {
+          console.log(`Character image found for ${bird.character}`);
+          
+          // Show a brief notification that the character has loaded
+          if (gameRunning || countdownActive) {
+            showCharacterNotification(bird.character);
+          }
+        } else {
+          console.log(`Character image NOT found for ${bird.character}`);
+        }
+        
+        // Update debug info
+        updateDebugInfo();
+      }
+      
+      function updateDebugInfo() {
+        const debugCharacter = document.getElementById("debugCharacter");
+        const debugImages = document.getElementById("debugImages");
+        const debugGameState = document.getElementById("debugGameState");
+        
+        if (debugCharacter) debugCharacter.textContent = bird.character;
+        if (debugImages) debugImages.textContent = Object.keys(characterImages).join(", ");
+        if (debugGameState) debugGameState.textContent = gameRunning ? "Running" : countdownActive ? "Countdown" : "Stopped";
+      }
+      
+      function showCharacterNotification(characterName) {
+        const notification = document.createElement("div");
+        notification.className = "fixed top-32 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-2 rounded-full font-bold z-50 animate-bounce";
+        
+        const characterNames = {
+          "default": "Default Bird",
+          "blue": "Blue Bird",
+          "purple": "Purple Bird",
+          "golden": "Golden Bird",
+          "rainbow": "Rainbow Bird",
+          "ninja": "Ninja Bird",
+          "giant": "Giant Bird",
+          "mini": "Mini Bird"
+        };
+        
+        notification.textContent = `🐦 ${characterNames[characterName] || characterName} Loaded!`;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+          notification.remove();
+        }, 2000);
       }
 
       function updateAbilityUI() {
@@ -1494,10 +1656,6 @@
         let effectiveSize = bird.size;
         let effectiveColor = bird.color;
         let useImage = false;
-        let characterImage = null;
-
-        console.log(`Rendering bird with character: ${bird.character}`);
-        console.log(`Available character images:`, Object.keys(characterImages));
 
         // Apply character-specific modifiers
         switch (bird.character) {
@@ -1505,13 +1663,11 @@
             effectiveColor = "#3B82F6";
             effectiveSize *= 0.9;
             useImage = true;
-            characterImage = "assets/images/blue-bird.png";
             break;
           case "purple":
             effectiveColor = "#8B5CF6";
             effectiveSize *= 0.8;
             useImage = true;
-            characterImage = "assets/images/purple-bird.png";
             break;
           case "mini":
             effectiveSize *= 0.6;
@@ -1521,7 +1677,6 @@
             break;
           default:
             useImage = true;
-            characterImage = "assets/images/tweety.png";
             break;
         }
         
@@ -1537,11 +1692,10 @@
           }
         }
 
-        if (useImage && characterImage) {
-          const cachedImage = characterImages[bird.character];
-          if (cachedImage) {
-            console.log(`Using cached image for ${bird.character}`);
-            // Use cached image for better performance
+        // Try to use cached character image
+        const cachedImage = characterImages[bird.character];
+        if (useImage && cachedImage && cachedImage.complete && cachedImage.naturalWidth > 0) {
+          try {
             ctx.drawImage(
               cachedImage,
               bird.x,
@@ -1549,14 +1703,19 @@
               effectiveSize,
               effectiveSize
             );
-          } else {
-            console.log(`No cached image for ${bird.character}, using fallback`);
-            // Fallback to basic shape if image not cached
+          } catch (error) {
+            console.log(`Error drawing image for ${bird.character}:`, error);
             renderBasicBird(effectiveSize, effectiveColor);
           }
         } else {
-          console.log(`Using basic shape for ${bird.character}`);
-          // Use basic shape for characters without images
+          // Fallback to basic shape if no image available
+          if (cachedImage) {
+            console.log(`Image for ${bird.character} not ready:`, {
+              complete: cachedImage.complete,
+              naturalWidth: cachedImage.naturalWidth,
+              naturalHeight: cachedImage.naturalHeight
+            });
+          }
           renderBasicBird(effectiveSize, effectiveColor);
         }
 
